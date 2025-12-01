@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brick Breaker</title>
+    <link rel="icon" type="image/x-icon" href="resources/imgs/favicon/favicon.ico">
+    <!--NÂO VOU USAR CANVAS-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="resources/css/site.css">
+</head>
+
+<body>
+    <div id="menu">
+        <img id="countdown" src="resources/imgs/countdown/3.png" alt="Countdown">
+        <audio id="countdown-beep">
+            <source src="resources/sounds/Menu-Music/Beep_countdown.mp3" type="audio/mpeg">
+        </audio>
+        <div id="menu-content">
+            <img src="resources/imgs/title.png" alt="Brick Breaker">
+            <button id="play-button" class="menu-button" onclick="startGame();">Jogar</button>
+            <button id="instructions-button" class="menu-button">Instruções</button>
+            <button id="credits-button" class="menu-button">Créditos</button>
+        </div>
+    </div>
+    <header id="header">
+        <img src="resources/imgs/title.png" alt="Brick Breaker">
+    </header>
+    <main>
+        <section id="left-panel" class="lateral-panel left-panel">
+            <span id="score">Score: 0</span>
+            <span id="lives">Lives: 3</span>
+        </section>
+        <section id="game-container" class="game-container">
+            <img id="paddle" class="paddle" src="resources/imgs/breakout_tile_set_1/png/50-Breakout-Tiles.png"
+                alt="Paddle" style="display: none;" />
+            <img id="ball" class="ball" src="resources/imgs/breakout_tile_set_1/png/58-Breakout-Tiles.png" alt="Ball"
+                style="display: none;" />
+        </section>
+        <section id="right-panel" class="lateral-panel right-panel"><!--Esta escondido pq nao sei se quero usar-->
+            <input type="button" id="start-button" value="Start Game"></input>
+            <input type="button" id="reset-button" value="Reset Game"></input>
+        </section>
+    </main>
+    <script src="resources/js/site.js"></script>
+</body>
+
+</html>
