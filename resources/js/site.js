@@ -191,11 +191,11 @@ function colisionsDetection(startCoordX, startCoordY, angle){
     var paddleCoordY = paddle.offsetTop;
 
     if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-ball.clientHeight)<=hittenCoordY && (paddleCoordX<hittenCoordX) && (hittenCoordX<(paddleCoordX+paddle.clientWidth))){
+        //left side of the paddle has some pixels of hitbox not working
 
-        console.log("Colided with paddle");
-        if(true){//se bater por baixo devia  ir para baixo
+        if((paddleCoordY+(paddle.clientHeight/2))>=(hittenCoordY+ball.clientHeight)){
             return "b";
-        }else{ //if(){//sinal deve estar errado
+        }else{ //not sure if this can create new bugs(remove if it is causing problems)
             return "t";
         }
     }
