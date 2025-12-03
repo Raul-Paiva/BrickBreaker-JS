@@ -3,6 +3,7 @@ var ball = document.getElementById("ball");
 var ballSpeedX = 2;
 var ballSpeedY = 2;
 var paddle = document.getElementById("paddle");
+var paddleSpeed = 20;
 var eletricEffect;
 var ballMovement;
 
@@ -12,6 +13,9 @@ window.onload = function() {
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
 
+/**
+ * Runs all the setup procedures and then starts the game.
+ */
 function startGame() {
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("header").style.visibility = "visible";
@@ -40,7 +44,7 @@ function startGame() {
 }
 
 function returnToMenu() {//revisar---------------------------------------------
-    stopAnimation();
+    stopAnimation(eletricEffect);
     clearInterval(ballMovement);
     document.getElementById("menu").classList.remove("hidden");
     document.getElementById("header").style.visibility = "hidden";
@@ -50,6 +54,9 @@ function returnToMenu() {//revisar---------------------------------------------
     paddle.style.display = "none";
 }
 
+/**
+ * Positions the game elements in their default starting positions.
+ */
 function gameStartPositions() {
     // definir as posicoes iniciais dos blocos, barra e bola
 
@@ -65,19 +72,33 @@ function gameStartPositions() {
     //Set default position for the paddle\\
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
-    startAnimation(50,52);
+    eletricEffect=startAnimation(50,52);
 }
 
+/**
+ * Creates an timeInterval that alternates between images to play an animation.(The image must be of the type X-Breakout-Tiles.png)
+ * @param {int} startN - Is the first image
+ * @param {int} endN - Is the last image
+ * @returns The created timeInterval
+ */
 function startAnimation(startN, endN) {
     var count = startN;
-    eletricEffect = setInterval(function(){
+    return setInterval(function(){
         document.getElementById("paddle").src=`resources/imgs/breakout_tile_set_1/png/${count}-Breakout-Tiles.png`;
         count++;
         if (count == endN+1) count = startN;
     }, 50);
 }
-function stopAnimation(){clearInterval(eletricEffect);}
+/**
+ * Stops the animation (it just clears the given timeInterval).
+ * @param {number} animation - The animation timeInterval
+ */
+function stopAnimation(animation){clearInterval(animation);}
 
+/**
+ * Moves the paddle according to the given speed.
+ * @param {number} deltaX 
+ */
 function movePaddle(deltaX) {
     var newLeft = paddle.offsetLeft + deltaX;
     var containerWidth = game_container.clientWidth;
@@ -92,20 +113,27 @@ function movePaddle(deltaX) {
     paddle.style.left = newLeft + "px";
 }
 
+/**
+ * Enables the controls that the user needs to play(WASD or Arrows).
+ */
 function enableGameControls() {
     document.addEventListener("keydown", function(event) {
         if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
-            movePaddle(-20);
+            movePaddle(-paddleSpeed);
         }
         else if(event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
-            movePaddle(20);
+            movePaddle(paddleSpeed);
         }
     });
 }
 
+/**
+ * Starts the Ball Motion creating an timeInterval
+ */
 function startBallMotion() {
     var angle;
     do {angle = Math.random() * Math.PI / 2 + Math.PI / 4;} while(angle==Math.PI/2); // Angle between 45 and 135 degrees
+
     var lastCoordX = ball.offsetLeft;
     var lastCoordY = ball.offsetTop;
     ballMovement = setInterval(function() {
