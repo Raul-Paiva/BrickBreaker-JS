@@ -257,7 +257,7 @@ main{
     }
 }
 
-/*------------------------Paddle & Ball------------------------*/
+/*------------------------Paddle & Ball & Bricks------------------------*/
 
 .paddle{
     position: absolute;
@@ -269,5 +269,11 @@ main{
 .ball{
     position: absolute;
     width: 1.5rem;
+    height: auto;
+}
+
+.brick{
+    position: absolute;
+    width: 6rem;
     height: auto;
 }

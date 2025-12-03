@@ -1,9 +1,20 @@
 var game_container = document.getElementById("game-container");
+//Ball
 var ball = document.getElementById("ball");
-var ballSpeedX = 2;
-var ballSpeedY = 2;
+var ballSpeedX = 3;
+var ballSpeedY = 3;
+//Paddle
 var paddle = document.getElementById("paddle");
 var paddleSpeed = 20;
+//Bricks
+var bricksMat=[];
+var brickWidth = document.getElementById("brickExample").clientWidth;
+var brickHeight = document.getElementById("brickExample").clientHeight;
+var brickRows=5;
+var brickCollums = 7;
+var bricksGap = 0.25;//in rem units
+document.getElementById("brickExample").style.display = "none";
+//Time Intervals
 var eletricEffect;
 var ballMovement;
 
@@ -23,7 +34,7 @@ function startGame() {
     document.getElementById("countdown").style.display = "block";
 
     gameStartPositions();
-
+    //maybe create an animation in the countdown interval for the bricks to come down
     var count = 2;
     var countdown = setInterval(function(){
         document.getElementById("countdown").src=`resources/imgs/countdown/${count}.png`;
@@ -38,6 +49,7 @@ function startGame() {
         document.getElementById("countdown").style.display = "none";
         document.getElementById("menu").classList.add("hidden");
 
+        bricksGenerator();
         enableGameControls();
         startBallMotion();
     }, 3500);
@@ -125,6 +137,35 @@ function enableGameControls() {
             movePaddle(paddleSpeed);
         }
     });
+}
+
+/**
+ * Generates the bricks in their default positions one by one
+ */
+function bricksGenerator(){
+    var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
+    var bricksHTML=[];
+
+    for (let i = 0; i < brickRows; i++) {
+        var row = []
+        var topMeasure = (2*rootFontSize) + (i*brickHeight)+ (i*bricksGap*rootFontSize);
+        for (let k = 0; k < brickCollums; k++) {
+            var leftMeasure = (k*brickWidth) + (k*bricksGap*rootFontSize) + (game_container.clientWidth - ((brickCollums*brickWidth) + (brickCollums*bricksGap*rootFontSize)))/2;
+
+            var brickImg = Math.ceil(Math.random()*20);//Gets a random brick
+            brickImg=brickImg%2==0?brickImg:(Math.ceil(Math.random()*4)<4?brickImg+1:brickImg);//Reduces the chances of the brick needing to be hit twice to break
+            row.push([(i+"-"+k),(brickImg%2==0?2:1)]);//1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break)
+            bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;top:'+topMeasure+'px;left:'+leftMeasure+'px;"/>');//Every brick will start equal, then it may break immediately or not
+        }
+        bricksMat.push(row);    
+    }
+
+    bricksHTML.reverse();
+    bricksHTML.forEach(element => {
+        var bricksContainer = document.createElement("div");
+        bricksContainer.innerHTML = element;
+        game_container.insertBefore(bricksContainer.firstElementChild, game_container.firstChild);
+    }); 
 }
 
 /**
