@@ -58,7 +58,7 @@ function startGame() {
         document.getElementById("countdown").src=`resources/imgs/countdown/${count}.png`;
         var beep = document.getElementById("generalAudio");
         beep.src = 'resources/sounds/Menu-Music/Beep_countdown.mp3'
-        beep.currentTime = 0;
+        //beep.currentTime = 0;
         beep.volume=1;
         beep.loop=false;
         beep.play();
@@ -120,7 +120,7 @@ function gameOver(){
     gameoverMenu.style.display="flex";
     var gameover_strong = document.getElementById("generalAudio");
     gameover_strong.src = 'resources/sounds/GameOver-Music/Theme2_byJosephPueyo/ThisGameIsOver.mp3'
-    gameover_strong.currentTime = 0;
+    //gameover_strong.currentTime = 0;
     gameover_strong.loop=false;
     gameover_strong.volume=1;
     gameover_strong.play();
@@ -128,7 +128,7 @@ function gameOver(){
         const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+gameoverThemeMusics[Math.round(Math.random()*(gameoverThemeMusics.length-1))];
         musicPlaying.loop=true;
-        musicPlaying.currentTime=0;
+        //musicPlaying.currentTime=0;
         musicPlaying.volume=0.1;
         musicPlaying.play();
     };
