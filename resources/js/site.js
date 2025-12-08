@@ -49,6 +49,7 @@ window.onload = function() {
 function startGame() {
     clearAllAudioElements();
     if(menuMusicInterval)clearInterval(menuMusicInterval);
+    soundControl();//If added full sound control to the game, change this
 
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("gameover-content").style.display = "none";
