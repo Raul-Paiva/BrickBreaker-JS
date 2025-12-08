@@ -1,7 +1,7 @@
 var game_container = document.getElementById("game-container");
 var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
 //Ball
-var ball = document.getElementById("ball");
+const ball = document.getElementById("ball");
 var ballSpeedX = 2;
 var ballSpeedY = 2;
 //Paddle
@@ -12,13 +12,15 @@ var bricksMat=[];
 var brickWidth = document.getElementById("brickExample").clientWidth;
 var brickHeight = document.getElementById("brickExample").clientHeight;
 var brickRows=5;
-var brickCollums = 7;
+var brickColumns = 7;
 var bricksGap = 0.25;//in rem units
 var bricksGridTopGap = 2;//in rem units
 document.getElementById("brickExample").style.display = "none";
 //Time Intervals
 var eletricEffect;
 var ballMovement;
+//Musics
+gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3']
 
 window.onload = function() {
     setBackgroundStars(document.body);
@@ -30,10 +32,14 @@ window.onload = function() {
  * Runs all the setup procedures and then starts the game.
  */
 function startGame() {
+    clearAllAudioElements();
+
     document.getElementById("menu-content").style.display = "none";
+    document.getElementById("gameover-content").style.display = "none";
     document.getElementById("header").style.visibility = "visible";
     document.getElementById("left-panel").style.visibility = "visible";
     document.getElementById("countdown").style.display = "block";
+    ball.style.opacity='1';
 
     gameStartPositions();
     //maybe create an animation in the countdown interval for the bricks to come down
@@ -49,6 +55,7 @@ function startGame() {
     setTimeout(function(){
         clearInterval(countdown);
         document.getElementById("countdown").style.display = "none";
+        document.getElementById("countdown").src="resources/imgs/countdown/3.png";
         document.getElementById("menu").classList.add("hidden");
 
         bricksGenerator();
@@ -58,14 +65,81 @@ function startGame() {
 }
 
 function returnToMenu() {//revisar---------------------------------------------
-    stopAnimation(eletricEffect);
-    clearInterval(ballMovement);
+    clearAllAudioElements();
+    
     document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("gameover-content").style.display = "none";
     document.getElementById("header").style.visibility = "hidden";
     document.getElementById("left-panel").style.visibility = "hidden";
     document.getElementById("menu-content").style.display = "flex";
     ball.style.display = "none";
     paddle.style.display = "none";
+
+    stopAnimation(eletricEffect);
+    removeBricks();
+}
+
+function gameOver(){
+    clearAllAudioElements();
+    const menu = document.getElementById("menu");
+    const gameoverMenu = document.getElementById("gameover-content");
+    var menuFade;
+
+    Array.from(gameoverMenu.getElementsByTagName('button')).forEach(element => {
+        element.disabled = "disabled";
+    });
+
+    const step = 0.05;
+    ball.style.opacity='1';
+    menu.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    gameoverMenu.style.opacity = '0';
+
+    clearInterval(ballMovement); 
+    disableGameControls();
+
+    menu.classList.remove("hidden");
+    gameoverMenu.style.display="flex";
+    var gameover_strong = document.getElementById("gameover-strong");
+    gameover_strong.play();
+    gameover_strong.onended=function(){
+        const musicPlaying = document.getElementById("gameover-soft");
+        musicPlaying.src = 'resources/sounds/'+gameoverThemeMusics[Math.round(Math.random()*(gameoverThemeMusics.length-1))];
+        musicPlaying.loop=true;
+        musicPlaying.volume=0.1;
+        musicPlaying.play();
+    };
+
+    var currentOpacity = 1; 
+    var ballFade = setInterval(() => {
+        if (currentOpacity <= step) {
+            clearInterval(ballFade); 
+            ball.style.opacity = '0';
+
+            currentOpacity = 0;
+            menuFade = setInterval(() => {
+                if (currentOpacity >= 0.7-step) {
+                    clearInterval(menuFade); 
+                    menu.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';    
+                    gameoverMenu.style.opacity = '1';          
+                    return; 
+                }
+                
+                currentOpacity += step;
+                menu.style.backgroundColor = 'rgba(0, 0, 0, '+currentOpacity.toString()+')';    
+                gameoverMenu.style.opacity = (currentOpacity+0.3).toString();
+            }, 100);             
+            return; 
+        }
+        
+        currentOpacity -= step;
+        ball.style.opacity = currentOpacity.toString();
+    }, 50);
+
+    setTimeout(() =>{
+        Array.from(gameoverMenu.getElementsByTagName('button')).forEach(element => {
+            element.disabled = "";
+        });
+    },6500);
 }
 
 /**
@@ -85,6 +159,10 @@ function gameStartPositions() {
     //Set default position for the paddle\\
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
+    //Assure there are no doubled bricks\\
+    removeBricks();
+
+    //Start Effects/Animations\\
     eletricEffect=startAnimation(50,52);
 }
 
@@ -127,17 +205,27 @@ function movePaddle(deltaX) {
 }
 
 /**
+ * Handles the controls that the user needs to play(WASD or Arrows).
+ */
+function handleGameControlls(event) {
+    if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+        movePaddle(-paddleSpeed);
+    }
+    else if(event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
+        movePaddle(paddleSpeed);
+    }
+}
+/**
  * Enables the controls that the user needs to play(WASD or Arrows).
  */
 function enableGameControls() {
-    document.addEventListener("keydown", function(event) {
-        if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
-            movePaddle(-paddleSpeed);
-        }
-        else if(event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
-            movePaddle(paddleSpeed);
-        }
-    });
+    document.addEventListener("keydown", handleGameControlls)
+}
+/**
+ * Disables the controls that the user needs to play(WASD or Arrows).
+ */
+function disableGameControls(){
+    document.removeEventListener("keydown", handleGameControlls);
 }
 
 /**
@@ -145,11 +233,12 @@ function enableGameControls() {
  */
 function bricksGenerator(){
     var bricksHTML=[];
+    bricksMat=[];
     for (let i = 0; i < brickRows; i++) {
         var row = []
         var topMeasure = (bricksGridTopGap*rootFontSize) + (i*brickHeight)+ (i*bricksGap*rootFontSize);
-        for (let k = 0; k < brickCollums; k++) {
-            var leftMeasure = (k*brickWidth) + (k*bricksGap*rootFontSize) + (game_container.clientWidth - ((brickCollums*brickWidth) + (brickCollums*bricksGap*rootFontSize)))/2;
+        for (let k = 0; k < brickColumns; k++) {
+            var leftMeasure = (k*brickWidth) + (k*bricksGap*rootFontSize) + (game_container.clientWidth - ((brickColumns*brickWidth) + (brickColumns*bricksGap*rootFontSize)))/2;
 
             var brickImg = Math.ceil(Math.random()*20);//Gets a random brick
             brickImg=brickImg%2==0?(Math.ceil(Math.random()*4)<4?brickImg-1:brickImg):brickImg;//Reduces the chances of the brick needing to be hit twice to break
@@ -168,6 +257,21 @@ function bricksGenerator(){
 }
 
 /**
+ * Removes all bricks from the page
+ */
+function removeBricks(){
+    for (let i = 0; i < brickRows; i++) {
+        for (let k = 0; k < brickColumns; k++) {
+            var brick = document.getElementById(i+"-"+k);
+            if(brick){
+                brick.parentNode.removeChild(brick);
+            }
+        }
+        
+    }     
+}
+
+/**
  * Starts the Ball Motion creating an timeInterval
  */
 function startBallMotion() {
@@ -180,10 +284,9 @@ function startBallMotion() {
         var newLeft;
         var newTop;
         if(ball.offsetTop>=game_container.clientHeight-20){
-            //returnToMenu();//substituir por gameover screen -------------------------------
-            //ball.offsetTop>=game_container.clientHeight-20 || ball.offsetLeft>=game_container.clientWidth-20
+            gameOver();
         }
-        //else{
+        else{
             var hittenSide = colisionsDetection();
             if(hittenSide!=""){
                 angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
@@ -191,7 +294,7 @@ function startBallMotion() {
                 lastCoordY = ball.offsetTop;
             }
             
-        //}
+        }
 
         if(angle < Math.PI && angle > Math.PI/2) {
             newLeft = ball.offsetLeft - ballSpeedX * Math.cos(Math.PI - angle);
@@ -224,16 +327,12 @@ function colisionsDetection(){
     if(hittenCoordY<=0)return "t";
     else if(hittenCoordX<=0)return "l";
     else if(hittenCoordX>=game_container.clientWidth-20)return "r";
-    //if(hittenCoordY>=game_container.clientHeight-20){
-    //    Call function to lose the game
-    //    return "";
-    //}
 
     //Paddle Colisons
     var paddleCoordX = paddle.offsetLeft;
     var paddleCoordY = paddle.offsetTop;
 
-    if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-ball.clientHeight)<=hittenCoordY && (paddleCoordX<hittenCoordX) && (hittenCoordX<(paddleCoordX+paddle.clientWidth))){
+    if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-ball.clientHeight)<=hittenCoordY && (paddleCoordX-ball.clientWidth<=hittenCoordX) && (hittenCoordX<=(paddleCoordX+paddle.clientWidth))){
         //left side of the paddle has some pixels of hitbox not working
 
         if((paddleCoordY+(paddle.clientHeight/2))>=(hittenCoordY+ball.clientHeight)){
@@ -244,7 +343,7 @@ function colisionsDetection(){
     }
 
     //Bricks Colisions
-    var bricksGridWidth = (brickCollums*brickWidth) + (brickCollums*bricksGap*rootFontSize)-bricksGap;
+    var bricksGridWidth = (brickColumns*brickWidth) + (brickColumns*bricksGap*rootFontSize)-bricksGap;
     var bricksGridHeight = (brickRows*brickHeight)+ (brickRows*bricksGap*rootFontSize)-bricksGap;
 
     if((game_container.clientWidth - bricksGridWidth)/2<hittenCoordX+ball.clientWidth && (game_container.clientWidth - bricksGridWidth)/2 +bricksGridWidth>hittenCoordX && (bricksGridTopGap*rootFontSize) + bricksGridHeight>hittenCoordY && (bricksGridTopGap*rootFontSize)<hittenCoordY+ball.clientHeight){
@@ -253,10 +352,9 @@ function colisionsDetection(){
         for (let i = 0; i < brickRows; i++) {
             //Checks Row
             if((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)<hittenCoordY+ball.clientHeight && hittenCoordY<(bricksGridTopGap*rootFontSize) + ((i+1)*brickHeight) + (i*bricksGap*rootFontSize)){               
-                for (let k = 0; k < brickCollums; k++) {
+                for (let k = 0; k < brickColumns; k++) {
                     //Check Column
                     if(bricksMat[i][k][1]!=0 && (game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)<hittenCoordX+ball.clientWidth && hittenCoordX<(game_container.clientWidth - bricksGridWidth)/2 + ((k+1)*brickWidth) + (k*bricksGap*rootFontSize)){
-                        console.log(i+"-"+k+ " | "+bricksMat[i][k][0] )
                         if (bricksMat[i][k][1]==1) {
                             document.getElementById(bricksMat[i][k][0]).style.display="none";
                         }else{
@@ -365,4 +463,16 @@ function setBackgroundStars(element) {
     svg += '</svg>';
     var encoded = encodeURIComponent(svg);
     element.style.backgroundImage = `url('data:image/svg+xml,${encoded}')`;
+}
+
+/**
+ * Stops playing all audios
+ */
+function clearAllAudioElements() {
+    const mediaElements = document.querySelectorAll('audio, video');
+
+    mediaElements.forEach(element => {
+        element.pause();
+        element.currentTime = 0; 
+    });
 }
