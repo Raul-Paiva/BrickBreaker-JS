@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brick Breaker</title>
     <link rel="icon" type="image/x-icon" href="resources/imgs/favicon/favicon.ico">
-    <!--NÂO VOU USAR CANVAS-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="resources/css/site.css">
 </head>
@@ -22,6 +21,7 @@
             <button id="play-button" class="menu-button" onclick="startGame();">Jogar</button>
             <button id="instructions-button" class="menu-button">Instruções</button>
             <button id="credits-button" class="menu-button">Créditos</button>
+            <i id="mute" class="fa-solid mute-button fa-volume-xmark" onclick="soundControl();"></i>
         </div>
         <div id="gameover-content" style="display: none;">
             <img src="resources/imgs/gameover/gameover-title.png" alt="Game Over">

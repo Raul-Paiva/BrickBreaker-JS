@@ -134,6 +134,12 @@ body{
         margin-bottom: 2rem;
     }
 
+.mute-button{
+    margin: 1rem;
+    cursor: pointer;
+    color: #01dcf0;
+}
+
 #countdown{
     margin: auto;
     display: none;

@@ -20,20 +20,25 @@ document.getElementById("brickExample").style.display = "none";
 var eletricEffect;
 var ballMovement;
 //Musics
-gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3'];
-gameThemeMusic=['Theme-Music/Theme2_byTechnodono/breakout.mp3','Theme-Music/Theme3_byMopz/ctr_ingame.mp3','Theme-Music/Theme3_byMopz/ctr_title.mp3','Theme-Music/Theme4_bySpringSpring/night night.mp3'];
-menuThemeMusics=['Theme-Music/Theme1_byJan125/1.mp3','Theme-Music/Theme1_byJan125/2.mp3','Theme-Music/Theme1_byJan125/3.mp3','Theme-Music/Theme1_byJan125/4.mp3','Theme-Music/Theme1_byJan125/5.mp3','Theme-Music/Theme1_byJan125/6.mp3'];
+var isMenuMuted = true; 
+var menuMusicInterval;
+var gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3'];
+var gameThemeMusic=['Theme-Music/Theme2_byTechnodono/breakout.mp3','Theme-Music/Theme3_byMopz/ctr_ingame.mp3','Theme-Music/Theme3_byMopz/ctr_title.mp3','Theme-Music/Theme4_bySpringSpring/night night.mp3'];
+var menuThemeMusics=['Theme-Music/Theme1_byJan125/1.mp3','Theme-Music/Theme1_byJan125/2.mp3','Theme-Music/Theme1_byJan125/3.mp3','Theme-Music/Theme1_byJan125/4.mp3','Theme-Music/Theme1_byJan125/5.mp3','Theme-Music/Theme1_byJan125/6.mp3'];
 
 window.onload = function() {
     setBackgroundStars(document.body);
 
-    /*setTimeout(() => {Nao funciona por causa das novas politicas do chrome
+    menuMusicInterval = setInterval(() => {
+        if(!isMenuMuted){
         const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
         musicPlaying.loop=true;
         musicPlaying.volume=0.1;
-        musicPlaying.play();    
-    }, 1000);*/
+        musicPlaying.play();  
+        clearInterval(menuMusicInterval);  
+        }
+    }, 1000);
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
@@ -43,6 +48,7 @@ window.onload = function() {
  */
 function startGame() {
     clearAllAudioElements();
+    if(menuMusicInterval)clearInterval(menuMusicInterval);
 
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("gameover-content").style.display = "none";
@@ -85,6 +91,12 @@ function startGame() {
 
 function returnToMenu() {//revisar---------------------------------------------
     clearAllAudioElements();
+
+    const musicPlaying = document.getElementById("generalAudio");
+    musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+    musicPlaying.loop=true;
+    musicPlaying.volume=0.1;
+    musicPlaying.play();    
     
     document.getElementById("menu").classList.remove("hidden");
     document.getElementById("gameover-content").style.display = "none";
@@ -499,4 +511,20 @@ function clearAllAudioElements() {
         element.pause();
         element.currentTime = 0; 
     });
+}
+
+function soundControl(){
+    var mute = document.getElementById("mute");
+    if(isMenuMuted){
+        mute.classList.remove('fa-volume-xmark');
+        mute.classList.add('fa-volume-high');
+        isMenuMuted=false;
+        mute.style.display="none";
+    }else{
+        mute.style.display="none";
+        //This is just because of the new chrome policies, maybe in the feature implement full sound control
+        //mute.classList.remove('fa-volume-high');
+        //mute.classList.add('fa-volume-xmark');
+        //isMenuMuted=true;
+    }
 }
