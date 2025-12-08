@@ -56,12 +56,12 @@ function startGame() {
     var count = 2;
     var countdown = setInterval(function(){
         document.getElementById("countdown").src=`resources/imgs/countdown/${count}.png`;
-        /*var beep = document.getElementById("generalAudio");
-        beep.src = 'resources/sounds/Menu-Music/Beep_countdown.mp3'
-        //beep.currentTime = 0;
+        var beep = document.getElementById("generalAudio");
+        beep.src = 'resources/sounds/Menu-Music/Beep_countdown.mp3';
+        beep.currentTime = 0;
         beep.volume=1;
         beep.loop=false;
-        beep.play();*/
+        beep.play();
         count--;
     }, 1000);
 
@@ -71,11 +71,11 @@ function startGame() {
         document.getElementById("countdown").src="resources/imgs/countdown/3.png";
         document.getElementById("menu").classList.add("hidden");
 
-        /*onst musicPlaying = document.getElementById("generalAudio");
+        const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
         musicPlaying.loop=true;
         musicPlaying.volume=0.1;
-        musicPlaying.play(); */   
+        musicPlaying.play();  
 
         bricksGenerator();
         enableGameControls();
@@ -118,9 +118,9 @@ function gameOver(){
 
     menu.classList.remove("hidden");
     gameoverMenu.style.display="flex";
-    /*var gameover_strong = document.getElementById("generalAudio");
-    gameover_strong.src = 'resources/sounds/GameOver-Music/Theme2_byJosephPueyo/ThisGameIsOver.mp3'
-    //gameover_strong.currentTime = 0;
+    var gameover_strong = document.getElementById("generalAudio");
+    gameover_strong.src = 'resources/sounds/GameOver-Music/Theme2_byJosephPueyo/ThisGameIsOver.mp3';
+    gameover_strong.currentTime = 0;
     gameover_strong.loop=false;
     gameover_strong.volume=1;
     gameover_strong.play();
@@ -128,10 +128,10 @@ function gameOver(){
         const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+gameoverThemeMusics[Math.round(Math.random()*(gameoverThemeMusics.length-1))];
         musicPlaying.loop=true;
-        //musicPlaying.currentTime=0;
+        musicPlaying.currentTime=0;
         musicPlaying.volume=0.1;
         musicPlaying.play();
-    };*/
+    };
 
     var currentOpacity = 1; 
     var ballFade = setInterval(() => {
@@ -397,13 +397,13 @@ function colisionsDetection(){
                             if (brickCenterCoordY>ballCenterCoordY) {
                                 return "b";
                             }else{
-                                return "t"
+                                return "t";
                             }                           
                         }else{
                             if (brickCenterCoordX>ballCenterCoordX) {
                                 return "r";
                             }else{
-                                return "l"
+                                return "l";
                             }
                         }
                     }                          
