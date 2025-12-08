@@ -20,10 +20,20 @@ document.getElementById("brickExample").style.display = "none";
 var eletricEffect;
 var ballMovement;
 //Musics
-gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3']
+gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3'];
+gameThemeMusic=['Theme-Music/Theme2_byTechnodono/breakout.mp3','Theme-Music/Theme3_byMopz/ctr_ingame.mp3','Theme-Music/Theme3_byMopz/ctr_title.mp3','Theme-Music/Theme4_bySpringSpring/night night.mp3'];
+menuThemeMusics=['Theme-Music/Theme1_byJan125/1.mp3','Theme-Music/Theme1_byJan125/2.mp3','Theme-Music/Theme1_byJan125/3.mp3','Theme-Music/Theme1_byJan125/4.mp3','Theme-Music/Theme1_byJan125/5.mp3','Theme-Music/Theme1_byJan125/6.mp3'];
 
 window.onload = function() {
     setBackgroundStars(document.body);
+
+    /*setTimeout(() => {Nao funciona por causa das novas politicas do chrome
+        const musicPlaying = document.getElementById("generalAudio");
+        musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+        musicPlaying.loop=true;
+        musicPlaying.volume=0.1;
+        musicPlaying.play();    
+    }, 1000);*/
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
@@ -46,8 +56,11 @@ function startGame() {
     var count = 2;
     var countdown = setInterval(function(){
         document.getElementById("countdown").src=`resources/imgs/countdown/${count}.png`;
-        var beep = document.getElementById("countdown-beep");
+        var beep = document.getElementById("generalAudio");
+        beep.src = 'resources/sounds/Menu-Music/Beep_countdown.mp3'
         beep.currentTime = 0;
+        beep.volume=1;
+        beep.loop=false;
         beep.play();
         count--;
     }, 1000);
@@ -57,6 +70,12 @@ function startGame() {
         document.getElementById("countdown").style.display = "none";
         document.getElementById("countdown").src="resources/imgs/countdown/3.png";
         document.getElementById("menu").classList.add("hidden");
+
+        const musicPlaying = document.getElementById("generalAudio");
+        musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+        musicPlaying.loop=true;
+        musicPlaying.volume=0.1;
+        musicPlaying.play();    
 
         bricksGenerator();
         enableGameControls();
@@ -99,12 +118,17 @@ function gameOver(){
 
     menu.classList.remove("hidden");
     gameoverMenu.style.display="flex";
-    var gameover_strong = document.getElementById("gameover-strong");
+    var gameover_strong = document.getElementById("generalAudio");
+    gameover_strong.src = 'resources/sounds/GameOver-Music/Theme2_byJosephPueyo/ThisGameIsOver.mp3'
+    gameover_strong.currentTime = 0;
+    gameover_strong.loop=false;
+    gameover_strong.volume=1;
     gameover_strong.play();
     gameover_strong.onended=function(){
-        const musicPlaying = document.getElementById("gameover-soft");
+        const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+gameoverThemeMusics[Math.round(Math.random()*(gameoverThemeMusics.length-1))];
         musicPlaying.loop=true;
+        musicPlaying.currentTime=0;
         musicPlaying.volume=0.1;
         musicPlaying.play();
     };
