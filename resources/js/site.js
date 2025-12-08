@@ -1,8 +1,9 @@
 var game_container = document.getElementById("game-container");
+var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
 //Ball
 var ball = document.getElementById("ball");
-var ballSpeedX = 3;
-var ballSpeedY = 3;
+var ballSpeedX = 2;
+var ballSpeedY = 2;
 //Paddle
 var paddle = document.getElementById("paddle");
 var paddleSpeed = 20;
@@ -13,6 +14,7 @@ var brickHeight = document.getElementById("brickExample").clientHeight;
 var brickRows=5;
 var brickCollums = 7;
 var bricksGap = 0.25;//in rem units
+var bricksGridTopGap = 2;//in rem units
 document.getElementById("brickExample").style.display = "none";
 //Time Intervals
 var eletricEffect;
@@ -78,7 +80,6 @@ function gameStartPositions() {
 
     //Set default position for the ball\\
     ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
-    var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
     ball.style.top = (31*rootFontSize - paddle.clientHeight/2) + "px";
 
     //Set default position for the paddle\\
@@ -143,18 +144,16 @@ function enableGameControls() {
  * Generates the bricks in their default positions one by one
  */
 function bricksGenerator(){
-    var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
     var bricksHTML=[];
-
     for (let i = 0; i < brickRows; i++) {
         var row = []
-        var topMeasure = (2*rootFontSize) + (i*brickHeight)+ (i*bricksGap*rootFontSize);
+        var topMeasure = (bricksGridTopGap*rootFontSize) + (i*brickHeight)+ (i*bricksGap*rootFontSize);
         for (let k = 0; k < brickCollums; k++) {
             var leftMeasure = (k*brickWidth) + (k*bricksGap*rootFontSize) + (game_container.clientWidth - ((brickCollums*brickWidth) + (brickCollums*bricksGap*rootFontSize)))/2;
 
             var brickImg = Math.ceil(Math.random()*20);//Gets a random brick
-            brickImg=brickImg%2==0?brickImg:(Math.ceil(Math.random()*4)<4?brickImg+1:brickImg);//Reduces the chances of the brick needing to be hit twice to break
-            row.push([(i+"-"+k),(brickImg%2==0?2:1)]);//1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break)
+            brickImg=brickImg%2==0?(Math.ceil(Math.random()*4)<4?brickImg-1:brickImg):brickImg;//Reduces the chances of the brick needing to be hit twice to break
+            row.push([(i+"-"+k),(brickImg%2==0?2:1),(brickImg%2==0?brickImg-1:brickImg)]);//1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break)
             bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;top:'+topMeasure+'px;left:'+leftMeasure+'px;"/>');//Every brick will start equal, then it may break immediately or not
         }
         bricksMat.push(row);    
@@ -185,7 +184,7 @@ function startBallMotion() {
             //ball.offsetTop>=game_container.clientHeight-20 || ball.offsetLeft>=game_container.clientWidth-20
         }
         //else{
-            var hittenSide = colisionsDetection(lastCoordX, lastCoordY, angle);
+            var hittenSide = colisionsDetection();
             if(hittenSide!=""){
                 angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
                 lastCoordX = ball.offsetLeft;
@@ -217,7 +216,7 @@ function startBallMotion() {
  * Checks if the ball collided and, if so, on which side.
  * @returns "t" for top, "b" for bottom, "r" for right, "l" for left and "" for nothing hitten
  */
-function colisionsDetection(startCoordX, startCoordY, angle){
+function colisionsDetection(){
     var hittenCoordX = ball.offsetLeft;
     var hittenCoordY = ball.offsetTop;
 
@@ -225,7 +224,10 @@ function colisionsDetection(startCoordX, startCoordY, angle){
     if(hittenCoordY<=0)return "t";
     else if(hittenCoordX<=0)return "l";
     else if(hittenCoordX>=game_container.clientWidth-20)return "r";
-    //if(hittenCoordY>=game_container.clientHeight-20)return "b";
+    //if(hittenCoordY>=game_container.clientHeight-20){
+    //    Call function to lose the game
+    //    return "";
+    //}
 
     //Paddle Colisons
     var paddleCoordX = paddle.offsetLeft;
@@ -241,11 +243,53 @@ function colisionsDetection(startCoordX, startCoordY, angle){
         }
     }
 
-    return "";
+    //Bricks Colisions
+    var bricksGridWidth = (brickCollums*brickWidth) + (brickCollums*bricksGap*rootFontSize)-bricksGap;
+    var bricksGridHeight = (brickRows*brickHeight)+ (brickRows*bricksGap*rootFontSize)-bricksGap;
 
-    var hip=Math.sqrt(Math.pow(Math.abs(startCoordX-hittenCoordX),2) + Math.pow(Math.abs(hittenCoordY-startCoordY),2));
-    var co = Math.abs(hittenCoordY-startCoordY);
-    var rawAngle=Math.asin(co/hip);
+    if((game_container.clientWidth - bricksGridWidth)/2<hittenCoordX+ball.clientWidth && (game_container.clientWidth - bricksGridWidth)/2 +bricksGridWidth>hittenCoordX && (bricksGridTopGap*rootFontSize) + bricksGridHeight>hittenCoordY && (bricksGridTopGap*rootFontSize)<hittenCoordY+ball.clientHeight){
+        var ballCenterCoordY=hittenCoordY+ball.clientHeight/2
+        var ballCenterCoordX=hittenCoordX+ball.clientWidth/2
+        for (let i = 0; i < brickRows; i++) {
+            //Checks Row
+            if((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)<hittenCoordY+ball.clientHeight && hittenCoordY<(bricksGridTopGap*rootFontSize) + ((i+1)*brickHeight) + (i*bricksGap*rootFontSize)){               
+                for (let k = 0; k < brickCollums; k++) {
+                    //Check Column
+                    if(bricksMat[i][k][1]!=0 && (game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)<hittenCoordX+ball.clientWidth && hittenCoordX<(game_container.clientWidth - bricksGridWidth)/2 + ((k+1)*brickWidth) + (k*bricksGap*rootFontSize)){
+                        console.log(i+"-"+k+ " | "+bricksMat[i][k][0] )
+                        if (bricksMat[i][k][1]==1) {
+                            document.getElementById(bricksMat[i][k][0]).style.display="none";
+                        }else{
+                            bricksMat[i][k][2]++;
+                            document.getElementById(bricksMat[i][k][0]).src='resources/imgs/breakout_tile_set_1/png/'+bricksMat[i][k][2]+'-Breakout-Tiles.png';
+                        }
+                        bricksMat[i][k][1]--;
+                        console.log("Colided with: "+i+"-"+k);
+
+                        //Detect hitten side
+                        brickCenterCoordY=(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
+                        brickCenterCoordX=(game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)+brickWidth/2;
+                        line1=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight-brickCenterCoordY);
+                        line2=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)-brickCenterCoordY);
+                        if((line1>=0 && line2>=0)||(line1<=0 && line2<=0)){
+                            if (brickCenterCoordY>ballCenterCoordY) {
+                                return "b";
+                            }else{
+                                return "t"
+                            }                           
+                        }else{
+                            if (brickCenterCoordX>ballCenterCoordX) {
+                                return "r";
+                            }else{
+                                return "l"
+                            }
+                        }
+                    }                          
+                }
+            }
+        }           
+    }
+    return "";
 }
 
 /**
