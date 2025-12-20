@@ -17,7 +17,7 @@
             <source src="" type="audio/mpeg">
         </audio>
         <div id="menu-content">
-            <img src="resources/imgs/title.png" alt="Brick Breaker">
+            <img src="resources/imgs/menu/title.png" alt="Brick Breaker">
             <button id="play-button" class="menu-button" onclick="startGame();">Jogar</button>
             <button id="instructions-button" class="menu-button">Instruções</button>
             <button id="credits-button" class="menu-button">Créditos</button>
@@ -30,12 +30,26 @@
         </div>
     </div>
     <header id="header">
-        <img src="resources/imgs/title.png" alt="Brick Breaker">
+        <img src="resources/imgs/menu/title.png" alt="Brick Breaker">
     </header>
     <main>
         <section id="left-panel" class="lateral-panel left-panel">
-            <span id="score">Score: 0</span>
-            <span id="lives">Lives: 3</span>
+            <div class="left-info">
+                <table class="table-info">
+                    <tr>
+                        <th>Lives</th>
+                        <td id="lives">
+                            <img id="heart1" src="resources/imgs/menu/hearts_byArtBIT/heart1.png" alt="Heart" class="hearts">
+                            <img id="heart2" src="resources/imgs/menu/hearts_byArtBIT/heart1.png" alt="Heart" class="hearts">
+                            <img id="heart3" src="resources/imgs/menu/hearts_byArtBIT/heart1.png" alt="Heart" class="hearts">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Score</th>
+                        <td id="score">0</td>
+                    </tr>
+                </table>
+            </div>
         </section>
         <section id="game-container" class="game-container">
             <img id="paddle" class="paddle" src="resources/imgs/breakout_tile_set_1/png/50-Breakout-Tiles.png"

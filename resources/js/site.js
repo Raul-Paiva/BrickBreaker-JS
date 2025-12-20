@@ -1,9 +1,12 @@
 var game_container = document.getElementById("game-container");
 var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
+var score = 0;
+var scoreMultiplier = 1;
+var lives = 3;
 //Ball
 const ball = document.getElementById("ball");
-var ballSpeedX = 2;
-var ballSpeedY = 2;
+var ballSpeedX = 3;
+var ballSpeedY = 3;
 //Paddle
 var paddle = document.getElementById("paddle");
 var paddleSpeed = 20;
@@ -34,7 +37,7 @@ window.onload = function() {
         const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
         musicPlaying.loop=true;
-        musicPlaying.volume=0.1;
+        musicPlaying.volume=0.2;
         musicPlaying.play();  
         clearInterval(menuMusicInterval);  
         }
@@ -57,6 +60,9 @@ function startGame() {
     document.getElementById("left-panel").style.visibility = "visible";
     document.getElementById("countdown").style.display = "block";
     ball.style.opacity='1';
+    for (let i = 0; i < lives; i++) document.getElementById(`heart${i+1}`).src="resources/imgs/menu/hearts_byArtBIT/heart1.png"; 
+    score=0;
+    document.getElementById("score").innerHTML=score;
 
     gameStartPositions();
     //maybe create an animation in the countdown interval for the bricks to come down
@@ -81,7 +87,7 @@ function startGame() {
         const musicPlaying = document.getElementById("generalAudio");
         musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
         musicPlaying.loop=true;
-        musicPlaying.volume=0.1;
+        musicPlaying.volume=0.2;
         musicPlaying.play();  
 
         bricksGenerator();
@@ -96,7 +102,7 @@ function returnToMenu() {//revisar---------------------------------------------
     const musicPlaying = document.getElementById("generalAudio");
     musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
     musicPlaying.loop=true;
-    musicPlaying.volume=0.1;
+    musicPlaying.volume=0.2;
     musicPlaying.play();    
     
     document.getElementById("menu").classList.remove("hidden");
@@ -142,7 +148,7 @@ function gameOver(){
         musicPlaying.src = 'resources/sounds/'+gameoverThemeMusics[Math.round(Math.random()*(gameoverThemeMusics.length-1))];
         musicPlaying.loop=true;
         musicPlaying.currentTime=0;
-        musicPlaying.volume=0.1;
+        musicPlaying.volume=0.2;
         musicPlaying.play();
     };
 
@@ -183,8 +189,7 @@ function gameOver(){
  * Positions the game elements in their default starting positions.
  */
 function gameStartPositions() {
-    // definir as posicoes iniciais dos blocos, barra e bola
-
+    
     //Activate ball and paddle\\
     ball.style.display = "inline";
     paddle.style.display = "inline";
@@ -317,21 +322,18 @@ function startBallMotion() {
 
     var lastCoordX = ball.offsetLeft;
     var lastCoordY = ball.offsetTop;
+    var count=0;
     ballMovement = setInterval(function() {
+        count+=10;
         var newLeft;
         var newTop;
-        if(ball.offsetTop>=game_container.clientHeight-20){
-            gameOver();
+        var hittenSide = colisionsDetection();
+        if(hittenSide!=""){
+            angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
+            lastCoordX = ball.offsetLeft;
+            lastCoordY = ball.offsetTop;
         }
-        else{
-            var hittenSide = colisionsDetection();
-            if(hittenSide!=""){
-                angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
-                lastCoordX = ball.offsetLeft;
-                lastCoordY = ball.offsetTop;
-            }
-            
-        }
+
 
         if(angle < Math.PI && angle > Math.PI/2) {
             newLeft = ball.offsetLeft - ballSpeedX * Math.cos(Math.PI - angle);
@@ -348,7 +350,10 @@ function startBallMotion() {
         }
         
         ball.style.left = newLeft + "px";
-        ball.style.top = newTop + "px";      
+        ball.style.top = newTop + "px";   
+        
+        //Score
+        document.getElementById("score").innerHTML=score;
     }, 10);
 }
 
@@ -364,6 +369,37 @@ function colisionsDetection(){
     if(hittenCoordY<=0)return "t";
     else if(hittenCoordX<=0)return "l";
     else if(hittenCoordX>=game_container.clientWidth-20)return "r";
+
+    if(ball.offsetTop>=game_container.clientHeight-20){
+        if (lives==1) {
+            lives=3;
+            document.getElementById("heart1").src="resources/imgs/menu/hearts_byArtBIT/heart3.png"; 
+            gameOver();
+        }else{
+            document.getElementById(`heart${lives}`).src="resources/imgs/menu/hearts_byArtBIT/heart3.png";
+            lives-=1  
+
+            //Set default position for the ball\\
+            ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
+            ball.style.top = (31*rootFontSize - paddle.clientHeight/2) + "px";
+
+            //Set default position for the paddle\\
+            paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
+
+            clearInterval(ballMovement);
+            disableGameControls();
+            var cleaner = new AbortController();
+            document.addEventListener("keydown", (event) => {
+                if(event.key === " "){
+                    startBallMotion();
+                    enableGameControls();
+                    cleaner.abort();
+                }
+            }, { signal: cleaner.signal }); 
+            return "b";
+        }
+            
+    }
 
     //Paddle Colisons
     var paddleCoordX = paddle.offsetLeft;
@@ -408,14 +444,18 @@ function colisionsDetection(){
                         line2=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)-brickCenterCoordY);
                         if((line1>=0 && line2>=0)||(line1<=0 && line2<=0)){
                             if (brickCenterCoordY>ballCenterCoordY) {
+                                score+=50*scoreMultiplier;
                                 return "b";
                             }else{
+                                score+=50*scoreMultiplier;
                                 return "t";
                             }                           
                         }else{
                             if (brickCenterCoordX>ballCenterCoordX) {
+                                score+=50*scoreMultiplier;
                                 return "r";
                             }else{
+                                score+=50*scoreMultiplier;
                                 return "l";
                             }
                         }
@@ -514,6 +554,9 @@ function clearAllAudioElements() {
     });
 }
 
+/**
+ * Controls if the sound is muted or not(for now just to work with new chrome policies)
+ */
 function soundControl(){
     var mute = document.getElementById("mute");
     if(isMenuMuted){

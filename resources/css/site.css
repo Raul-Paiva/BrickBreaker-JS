@@ -260,9 +260,38 @@ main{
     }
 */
 .left-panel{
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     /*tabela com o score*/
+}
+
+.left-info{
+    margin-top: 2rem;
+    width: 80%;
+}
+    .left-info div{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    
+.table-info{
+    width: 100%;
+    border: #01dcf0 solid 2px;
+    border-collapse:collapse;
+}
+    .table-info td, .table-info th{
+        border: #01dcf0 solid 2px;
+        height: 2rem;
+    }
+    .table-info th{
+        width: 33%;
+    }
+
+.hearts{
+    width: 1.3rem;
+    height: auto;
 }
 
 @keyframes rotation{

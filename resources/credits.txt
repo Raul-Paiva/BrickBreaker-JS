@@ -8,6 +8,7 @@ https://cooltext.com/
 Images
 https://opengameart.org/
 Game Graphical Assets: https://opengameart.org/content/breakout-brick-breaker-tile-set-free by imaginelabs
+Health Hearts: https://opengameart.org/content/healthbar-sprite by ArtBIT
 
 Musics
 https://opengameart.org/
