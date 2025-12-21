@@ -96,6 +96,37 @@ function startGame() {
     }, 3500);
 }
 
+/**
+ * Displays the credits
+ */
+function showCredits(){
+    document.getElementById("menu-content").style.display = "none";
+    document.getElementById("credits").style.display = "flex";
+    soundControl();
+}
+
+/**
+ * Hides the credits
+ */
+function hideCredits(){
+    document.getElementById("credits").style.display = "none";
+    document.getElementById("menu-content").style.display = "flex"; 
+}
+
+/**
+ * Controls if the credits are rolling or not
+ */
+function controlCredits(){
+    var crw = document.getElementById("credits-wrapper");
+    if(crw.style.animationPlayState == "running"){
+        crw.style.animationPlayState = "paused";
+    }
+    else{
+        crw.style.animationPlayState = "running";
+    }
+    
+}
+
 function returnToMenu() {//revisar---------------------------------------------
     clearAllAudioElements();
 
@@ -189,7 +220,7 @@ function gameOver(){
  * Positions the game elements in their default starting positions.
  */
 function gameStartPositions() {
-    
+
     //Activate ball and paddle\\
     ball.style.display = "inline";
     paddle.style.display = "inline";
@@ -560,8 +591,8 @@ function clearAllAudioElements() {
 function soundControl(){
     var mute = document.getElementById("mute");
     if(isMenuMuted){
-        mute.classList.remove('fa-volume-xmark');
-        mute.classList.add('fa-volume-high');
+        //mute.classList.remove('fa-volume-xmark');
+        //mute.classList.add('fa-volume-high');
         isMenuMuted=false;
         mute.style.display="none";
     }else{

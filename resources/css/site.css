@@ -121,6 +121,60 @@ body{
             filter: blur(0.5rem);
         }
 
+#credits{
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+#credits-wrapper{
+    position: absolute;
+    width: 55rem;
+    height: 100%;
+    text-align: center;
+    top: 100%; 
+    padding: 5rem;
+
+    animation: scroll-credits 25s linear infinite;
+    animation-play-state: running;
+    will-change: transform;
+}
+    #credits-wrapper h4{
+        margin-bottom: 0px;
+        color: #01dcf0;
+    }
+    #credits-wrapper a{
+        color: #008c99;
+        text-decoration: none;
+    }
+
+@keyframes scroll-credits {
+  from { transform: translateY(0); }
+  to { transform: translateY(-175%);  }
+}
+
+
+.credits-return{
+    border-radius: 50%;
+    height: 3rem;
+    width: 3rem;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: 4rem;
+    margin-left: 4rem;
+}
+    .credits-return svg{
+        width: 2rem;
+        height: 2rem;
+    }
+
 #gameover-content{
     margin-top: 10rem;
     display: flex;

@@ -20,13 +20,45 @@
             <img src="resources/imgs/menu/title.png" alt="Brick Breaker">
             <button id="play-button" class="menu-button" onclick="startGame();">Jogar</button>
             <button id="instructions-button" class="menu-button">Instruções</button>
-            <button id="credits-button" class="menu-button">Créditos</button>
+            <button id="credits-button" class="menu-button" onclick="showCredits();">Créditos</button>
             <i id="mute" class="fa-solid mute-button fa-volume-xmark" onclick="soundControl();"></i>
         </div>
         <div id="gameover-content" style="display: none;">
             <img src="resources/imgs/gameover/gameover-title.png" alt="Game Over">
             <button id="play-button" class="menu-button" onclick="startGame();">Tentar Novamente</button>
             <button id="returntomenu-button" class="menu-button" onclick="returnToMenu();">Voltar para o Menu</button>
+        </div>
+        <div id="credits" style="display: none;">
+            <div id="credits-wrapper" onmouseenter="this.style.animationPlayState = 'paused';" onmouseleave="this.style.animationPlayState = 'running';">
+                <h4>Code</h4><br>
+                <a href="https://github.com/Raul-Paiva/BrickBreaker-JS ">Coded by Raul Paiva</a>
+                <br><br>
+                <h4>Text and Info</h4><br>
+                <a href="https://www.youtube.com/watch?v=-VOUK-xFAyk&t=2s">Tutorial for animations by Kevin Powell</a><br>
+                <a href="https://cooltextcom/">Titles and texts in images</a>
+                <br><br>
+                <h4>Images</h4><br>
+                <a href="https://opengameart.org/">Main images source</a><br>
+                <a href="https://opengameart.org/content/breakout-brick-breaker-tile-set-free">Game Graphical Assets by imaginelabs</a><br>
+                <a href="https://opengameart.org/content/healthbar-sprite">Health Hearts by ArtBIT</a>
+                <br><br>
+                <h4>Musics</h4><br>
+                <a href="https://opengameart.org/">Main musics source</a><br>
+                <a href="https://opengameart.org/content/bedtime-breakout-theme">Theme Music by SpringSpring</a><br>
+                <a href="https://opengameart.org/content/breakout-music">Theme Music by Mopz</a><br>
+                <a href="https://opengameart.org/content/breakout-0">Theme Music by Technodono</a><br>
+                <a href="https://opengameart.org/content/some-kind-of-aceattorney-ish-music-thingie">Theme Music by Jan125</a><br>
+                <a href="https://opengameart.org/content/gui-sound-effects-4">Countdown by jalastram(Jesús Lastra)</a><br>
+                <a href="https://opengameart.org/content/game-over-theme">Game Over Music by Cleyton Kauffman - https://soundcloud.com/cleytonkauffman</a><br>
+                <a href="https://opengameart.org/content/this-game-is-over">Game Over Music by Joseph Pueyo - http://www.josephpueyo.com/</a>
+                <br><br>
+            </div>
+            <button id="credits-return" class="credits-return menu-button" onclick="hideCredits();">
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#01dcf0" stroke="none">
+                        <path d="M2729 5050 c-31 -9 -2661 -1908 -2701 -1951 -31 -32 -34 -54 -16 -94 10 -23 710 -531 2461 -1787 274 -196 285 -201 338 -149 l29 29 0 531 0 530 88 -5 c48 -3 136 -12 195 -20 541 -74 977 -385 1117 -798 118 -347 10 -724 -301 -1046 -35 -36 -71 -76 -81 -90 -53 -74 27 -155 137 -137 68 11 342 225 511 398 324 333 514 695 590 1124 27 150 25 442 -4 595 -72 384 -232 708 -494 997 -397 438 -994 710 -1646 749 l-112 7 0 524 c0 572 0 571 -57 590 -15 6 -40 7 -54 3z"/></g>
+                </svg>
+            </button>
         </div>
     </div>
     <header id="header">
