@@ -389,6 +389,22 @@ function startBallMotion() {
 }
 
 /**
+ * Puts the ball and paddle in the center and waits user input to restart its movement 
+ */
+function restartBallMotion(){
+    clearInterval(ballMovement);
+    disableGameControls();
+    var cleaner = new AbortController();
+    document.addEventListener("keydown", (event) => {
+        if(event.key === " "){
+            startBallMotion();
+            enableGameControls();
+            cleaner.abort();
+        }
+    }, { signal: cleaner.signal });     
+}
+
+/**
  * Checks if the ball collided and, if so, on which side.
  * @returns "t" for top, "b" for bottom, "r" for right, "l" for left and "" for nothing hitten
  */
@@ -417,16 +433,7 @@ function colisionsDetection(){
             //Set default position for the paddle\\
             paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
-            clearInterval(ballMovement);
-            disableGameControls();
-            var cleaner = new AbortController();
-            document.addEventListener("keydown", (event) => {
-                if(event.key === " "){
-                    startBallMotion();
-                    enableGameControls();
-                    cleaner.abort();
-                }
-            }, { signal: cleaner.signal }); 
+            restartBallMotion();
             return "b";
         }
             
