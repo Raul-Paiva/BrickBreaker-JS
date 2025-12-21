@@ -389,7 +389,7 @@ function startBallMotion() {
 }
 
 /**
- * Puts the ball and paddle in the center and waits user input to restart its movement 
+ * Creates an Event Listener that waits user input to restart ball and paddle movement 
  */
 function restartBallMotion(){
     var cleaner = new AbortController();
@@ -433,7 +433,7 @@ function colisionsDetection(){
 
             clearInterval(ballMovement);
             disableGameControls();
-            
+
             restartBallMotion();
             return "b";
         }
