@@ -392,8 +392,6 @@ function startBallMotion() {
  * Puts the ball and paddle in the center and waits user input to restart its movement 
  */
 function restartBallMotion(){
-    clearInterval(ballMovement);
-    disableGameControls();
     var cleaner = new AbortController();
     document.addEventListener("keydown", (event) => {
         if(event.key === " "){
@@ -433,6 +431,9 @@ function colisionsDetection(){
             //Set default position for the paddle\\
             paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
+            clearInterval(ballMovement);
+            disableGameControls();
+            
             restartBallMotion();
             return "b";
         }
