@@ -475,7 +475,6 @@ function colisionsDetection(){
                             document.getElementById(bricksMat[i][k][0]).src='resources/imgs/breakout_tile_set_1/png/'+bricksMat[i][k][2]+'-Breakout-Tiles.png';
                         }
                         bricksMat[i][k][1]--;
-                        console.log("Colided with: "+i+"-"+k);
 
                         //Check if there is any brick left
                         var countingSum=0;
