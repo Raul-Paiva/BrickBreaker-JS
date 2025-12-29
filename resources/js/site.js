@@ -3,6 +3,7 @@ var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSiz
 var score = 0;
 var scoreMultiplier = 1;
 var lives = 3;
+var actualLevel = 0;
 //Ball
 const ball = document.getElementById("ball");
 var ballSpeedX = 3;
@@ -127,7 +128,7 @@ function controlCredits(){
     
 }
 
-function returnToMenu() {//revisar---------------------------------------------
+function returnToMenu() {
     clearAllAudioElements();
 
     const musicPlaying = document.getElementById("generalAudio");
@@ -304,7 +305,7 @@ function disableGameControls(){
 /**
  * Generates the bricks in their default positions one by one
  */
-function bricksGenerator(){
+function bricksGenerator(visibility="visible",topModifier=0,leftModifier=0){
     var bricksHTML=[];
     bricksMat=[];
     for (let i = 0; i < brickRows; i++) {
@@ -316,7 +317,7 @@ function bricksGenerator(){
             var brickImg = Math.ceil(Math.random()*20);//Gets a random brick
             brickImg=brickImg%2==0?(Math.ceil(Math.random()*4)<4?brickImg-1:brickImg):brickImg;//Reduces the chances of the brick needing to be hit twice to break
             row.push([(i+"-"+k),(brickImg%2==0?2:1),(brickImg%2==0?brickImg-1:brickImg)]);//1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break)
-            bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;top:'+topMeasure+'px;left:'+leftMeasure+'px;"/>');//Every brick will start equal, then it may break immediately or not
+            bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;visibility:'+visibility+';top:'+(topMeasure+topModifier)+'px;left:'+(leftMeasure+leftModifier)+'px;"/>');//Every brick will start equal, then it may break immediately or not
         }
         bricksMat.push(row);    
     }
@@ -391,7 +392,7 @@ function startBallMotion() {
 /**
  * Creates an Event Listener that waits user input to restart ball and paddle movement 
  */
-function restartBallMotion(){
+function restartBallMotionOnUserInput(){
     var cleaner = new AbortController();
     document.addEventListener("keydown", (event) => {
         if(event.key === " "){
@@ -434,7 +435,7 @@ function colisionsDetection(){
             clearInterval(ballMovement);
             disableGameControls();
 
-            restartBallMotion();
+            restartBallMotionOnUserInput();
             return "b";
         }
             
@@ -475,6 +476,11 @@ function colisionsDetection(){
                         }
                         bricksMat[i][k][1]--;
                         console.log("Colided with: "+i+"-"+k);
+
+                        //Check if there is any brick left
+                        var countingSum=0;
+                        for (let x = 0; x < bricksMat.length; x++)for (let b = 0; b < bricksMat[0].length; b++)countingSum+=bricksMat[x][b][1];
+                        if(countingSum==0){endLevel();return "";}//Estara correto dar return "" ou devia ser return "b" ??????????????????
 
                         //Detect hitten side
                         brickCenterCoordY=(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
@@ -566,6 +572,48 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
         }
     }   
     return angle;
+}
+
+/**
+ * Ends the level and starts the new one
+ */
+function endLevel(){
+    actualLevel++;
+    
+    //Set default position for the ball\\
+    ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
+    ball.style.top = (31*rootFontSize - paddle.clientHeight/2) + "px";
+
+    //Set default position for the paddle\\
+    paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
+
+    //Stops the ball and paddle while the bricks are being rebuilt\\
+    clearInterval(ballMovement);
+    disableGameControls();   
+    
+    //Removes the bricks to start rebuilding them\\
+    removeBricks();
+
+    //Generates the bricks hidden to add animation\\
+    var topMod = ((bricksGridTopGap*rootFontSize)+(brickRows*brickHeight)+(brickRows*bricksGap*rootFontSize)-bricksGap);
+    bricksGenerator("hidden",-topMod,0);
+
+    //Start the animation\\
+    var newLevelBricksAnimation = setInterval(function(){
+        for (let i = 0; i < brickRows; i++) {
+            for (let k = 0; k < brickColumns; k++) {
+                var b = document.getElementById(i+"-"+k);
+                b.style.top=(b.offsetTop+1)+"px";
+                if(b.offsetTop>rootFontSize/3)b.style.visibility="visible";
+            }
+        }
+
+        if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
+            enableGameControls();
+            startBallMotion();
+            clearInterval(newLevelBricksAnimation);
+        }
+    },100);
 }
 
 /**
