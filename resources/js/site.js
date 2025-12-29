@@ -480,7 +480,7 @@ function colisionsDetection(){
                         //Check if there is any brick left
                         var countingSum=0;
                         for (let x = 0; x < bricksMat.length; x++)for (let b = 0; b < bricksMat[0].length; b++)countingSum+=bricksMat[x][b][1];
-                        if(countingSum==0){endLevel();return "";}//Estara correto dar return "" ou devia ser return "b" ??????????????????
+                        if(countingSum==0){endLevel();return "";}
 
                         //Detect hitten side
                         brickCenterCoordY=(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
