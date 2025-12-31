@@ -4,14 +4,20 @@ var score = 0;
 var scoreMultiplier = 1;
 var lives = 3;
 var actualLevel = 0;
-//Ball
+var gravitySpeed = 0.08;//in rem units
+//Powers\\
+/**
+ * Index: 0 - Interval Id; 1 - Expected Time(can be null); 2 - Type(f - Falling, tb - Timed Bonus, tm - Timed Modification); 3 - Status(1-running, 0-ended);
+ */
+var activePowers =[];
+//Ball\\
 const ball = document.getElementById("ball");
-var ballSpeedX = 3;
-var ballSpeedY = 3;
-//Paddle
+var ballSpeedX = 0.2*rootFontSize;
+var ballSpeedY = 0.2*rootFontSize;
+//Paddle\\
 var paddle = document.getElementById("paddle");
 var paddleSpeed = 20;
-//Bricks
+//Bricks\\
 var bricksMat=[];
 var brickWidth = document.getElementById("brickExample").clientWidth;
 var brickHeight = document.getElementById("brickExample").clientHeight;
@@ -20,10 +26,13 @@ var brickColumns = 7;
 var bricksGap = 0.25;//in rem units
 var bricksGridTopGap = 2;//in rem units
 document.getElementById("brickExample").style.display = "none";
-//Time Intervals
-var eletricEffect;
-var ballMovement;
-//Musics
+//GameLoop\\
+var gameLoop;//only the game elements(excludes anything that happens in the menus)
+/**
+ * Index: 0 - Interval Id; 1 - Function;
+ */
+var runningFunctions = [];
+//Musics\\
 var isMenuMuted = true; 
 var menuMusicInterval;
 var gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3'];
@@ -93,6 +102,7 @@ function startGame() {
 
         bricksGenerator();
         enableGameControls();
+        startGameLoop();
         startBallMotion();
     }, 3500);
 }
@@ -145,7 +155,7 @@ function returnToMenu() {
     ball.style.display = "none";
     paddle.style.display = "none";
 
-    stopAnimation(eletricEffect);
+    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="eletricEffect"),1);//? e o resto nao para
     removeBricks();
 }
 
@@ -164,7 +174,7 @@ function gameOver(){
     menu.style.backgroundColor = 'rgba(0, 0, 0, 0)';
     gameoverMenu.style.opacity = '0';
 
-    clearInterval(ballMovement); 
+    clearInterval(gameLoop); 
     disableGameControls();
 
     menu.classList.remove("hidden");
@@ -237,7 +247,18 @@ function gameStartPositions() {
     removeBricks();
 
     //Start Effects/Animations\\
-    eletricEffect=startAnimation(50,52);
+    if(!runningFunctions.some(f => f[0] === "eletricEffect"))runningFunctions.push(["eletricEffect",startAnimation(50,52)]);
+}
+
+/**
+ * Runs the functions in the order they are stored in the global list "runningFunctions"
+ */
+function startGameLoop(){
+    gameLoop = setInterval(() => {
+        runningFunctions.forEach(func => {
+            func[1]();   
+        });
+    },10);
 }
 
 /**
@@ -248,17 +269,16 @@ function gameStartPositions() {
  */
 function startAnimation(startN, endN) {
     var count = startN;
-    return setInterval(function(){
-        document.getElementById("paddle").src=`resources/imgs/breakout_tile_set_1/png/${count}-Breakout-Tiles.png`;
-        count++;
-        if (count == endN+1) count = startN;
-    }, 50);
+    var intervalTimeControl=0;
+    return function(){
+        if (intervalTimeControl%5==0){
+            document.getElementById("paddle").src=`resources/imgs/breakout_tile_set_1/png/${count}-Breakout-Tiles.png`;
+            count++;
+            if (count == endN+1) count = startN;
+        }
+        intervalTimeControl++;
+    };
 }
-/**
- * Stops the animation (it just clears the given timeInterval).
- * @param {number} animation - The animation timeInterval
- */
-function stopAnimation(animation){clearInterval(animation);}
 
 /**
  * Moves the paddle according to the given speed.
@@ -281,25 +301,33 @@ function movePaddle(deltaX) {
 /**
  * Handles the controls that the user needs to play(WASD or Arrows).
  */
-function handleGameControlls(event) {
+function handleGameControls(event) {
     if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+        event.preventDefault(); 
         movePaddle(-paddleSpeed);
     }
     else if(event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
+        event.preventDefault(); 
         movePaddle(paddleSpeed);
+    }else if(event.key==="ArrowUp" || event.key==="ArrowDown" || event.key=== " "){
+        event.preventDefault();
+    }
+
+    if (event.key=="q") {////////////////////////////////////////////////////remover isto, so para testes
+        endLevel();
     }
 }
 /**
  * Enables the controls that the user needs to play(WASD or Arrows).
  */
 function enableGameControls() {
-    document.addEventListener("keydown", handleGameControlls)
+    document.addEventListener("keydown", handleGameControls)
 }
 /**
  * Disables the controls that the user needs to play(WASD or Arrows).
  */
 function disableGameControls(){
-    document.removeEventListener("keydown", handleGameControlls);
+    document.removeEventListener("keydown", handleGameControls);
 }
 
 /**
@@ -308,16 +336,42 @@ function disableGameControls(){
 function bricksGenerator(visibility="visible",topModifier=0,leftModifier=0){
     var bricksHTML=[];
     bricksMat=[];
+    var countPowers=0;
     for (let i = 0; i < brickRows; i++) {
         var row = []
         var topMeasure = (bricksGridTopGap*rootFontSize) + (i*brickHeight)+ (i*bricksGap*rootFontSize);
         for (let k = 0; k < brickColumns; k++) {
             var leftMeasure = (k*brickWidth) + (k*bricksGap*rootFontSize) + (game_container.clientWidth - ((brickColumns*brickWidth) + (brickColumns*bricksGap*rootFontSize)))/2;
+            var brickPower = 0;
+            var isPowersLimitExceded=countPowers+1>(brickColumns*brickRows*0.2);
 
-            var brickImg = Math.ceil(Math.random()*20);//Gets a random brick
-            brickImg=brickImg%2==0?(Math.ceil(Math.random()*4)<4?brickImg-1:brickImg):brickImg;//Reduces the chances of the brick needing to be hit twice to break
-            row.push([(i+"-"+k),(brickImg%2==0?2:1),(brickImg%2==0?brickImg-1:brickImg)]);//1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break)
-            bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;visibility:'+visibility+';top:'+(topMeasure+topModifier)+'px;left:'+(leftMeasure+leftModifier)+'px;"/>');//Every brick will start equal, then it may break immediately or not
+            //Gets a random brick\\
+            var brickImg = Math.ceil(Math.random()*20);
+
+            //Controls the unbreakable bricks(6.7%-4%)\\
+            if (actualLevel>0 && brickPower==0 && !isPowersLimitExceded && Math.ceil(Math.random()*((15+actualLevel<=25)?15+actualLevel:25))==5){brickPower=2;countPowers++}
+
+            //Controls the extra life bricks(2.5%)\\
+            if(brickImg==7 || brickImg==8){
+                if(actualLevel>1 && brickPower==0 && !isPowersLimitExceded && Math.ceil(Math.random()*4)==4){
+                    brickImg=7;
+                    brickPower=1;
+                    countPowers++;
+                }
+                else{
+                    do{
+                        brickImg = Math.ceil(Math.random()*20);
+                    }while(brickImg==7 || brickImg==8)
+                }
+            }
+
+            //Reduces the chances of the brick needing to be hit twice to break\\
+            brickImg=brickImg%2==0?(Math.ceil(Math.random()*4)<4?brickImg-1:brickImg):brickImg;
+
+            //Every brick will start equal, then it may break immediately or not\\
+            //brick id || 1->Will break immediately;2->Will change the image to Semi-Breaked in the first hit;(Nº of Hits needed to break) || brick image || 0->No Power;1->Extra Life Brick;2->Unbreakable Brick
+            row.push([(i+"-"+k),(brickImg%2==0?2:1),(brickImg%2==0?brickImg-1:brickImg),brickPower]);
+            bricksHTML.push('<img id="'+i+'-'+k+'" class="brick" src="resources/imgs/breakout_tile_set_1/png/'+(brickImg%2==0?brickImg-1:brickImg)+'-Breakout-Tiles.png" alt="Brick" style="display:inline;visibility:'+visibility+';top:'+(topMeasure+topModifier)+'px;left:'+(leftMeasure+leftModifier)+'px;"/>');
         }
         bricksMat.push(row);    
     }
@@ -341,9 +395,54 @@ function removeBricks(){
                 brick.parentNode.removeChild(brick);
             }
         }
-        
     }     
 }
+
+/**
+ * Starts the powers intervals
+ * @param {HTMLElement} powerHTMLElement - Power HTML Element
+ * @param {int} powerDuration - Expected Duration in miliseconds (null if not expected)
+ * @param {string} powerType - Types: Falling - f; Timed Bonus - tb; Timed Modification - tm;
+ */
+function startPower(powerHTMLElement,powerDuration,powerType){
+    var powerId = powerHTMLElement.id;
+    var startlevel = actualLevel;
+    if (powerType=="f") {
+        if(!runningFunctions.some(f => f[0] === powerId))runningFunctions.push([powerId,function(){
+                console.log(powerId);
+                var hittenCoordX = powerHTMLElement.offsetLeft;
+                var hittenCoordY = powerHTMLElement.offsetTop;
+
+                var paddleCoordX = paddle.offsetLeft;
+                var paddleCoordY = paddle.offsetTop;
+
+                if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-powerHTMLElement.clientHeight)<=hittenCoordY && (paddleCoordX-powerHTMLElement.clientWidth<=hittenCoordX) && (hittenCoordX<=(paddleCoordX+paddle.clientWidth))){
+
+                    activePowers[activePowers.findIndex(p=>p[0]===powerId)][3]=0;
+                    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
+                    powerHTMLElement.remove();
+                    
+                    if(lives<3){
+                        lives++;
+                        document.getElementById(`heart${lives}`).src="resources/imgs/menu/hearts_byArtBIT/heart1.png";
+                    }
+
+                }else if(hittenCoordY>=game_container.clientHeight-20 || startlevel!=actualLevel){
+
+                    activePowers[activePowers.findIndex(p=>p[0]===powerId)][3]=0;
+                    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
+                    powerHTMLElement.remove();
+                }
+
+                powerHTMLElement.style.top=(powerHTMLElement.offsetTop + gravitySpeed*rootFontSize)+"px";
+            }]);
+        activePowers.push([powerId,null,"f",1]);
+    }//else if (false) {
+        //other powers
+    //}
+}
+
+
 
 /**
  * Starts the Ball Motion creating an timeInterval
@@ -355,7 +454,7 @@ function startBallMotion() {
     var lastCoordX = ball.offsetLeft;
     var lastCoordY = ball.offsetTop;
     var count=0;
-    ballMovement = setInterval(function() {
+    if(!runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.push(["ballMovement",function() {
         count+=10;
         var newLeft;
         var newTop;
@@ -386,13 +485,16 @@ function startBallMotion() {
         
         //Score
         document.getElementById("score").innerHTML=score;
-    }, 10);
+    }]);
 }
 
 /**
  * Creates an Event Listener that waits user input to restart ball and paddle movement 
  */
 function restartBallMotionOnUserInput(){
+    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+    disableGameControls();
+
     var cleaner = new AbortController();
     document.addEventListener("keydown", (event) => {
         if(event.key === " "){
@@ -432,9 +534,6 @@ function colisionsDetection(){
             //Set default position for the paddle\\
             paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
-            clearInterval(ballMovement);
-            disableGameControls();
-
             restartBallMotionOnUserInput();
             return "b";
         }
@@ -463,46 +562,76 @@ function colisionsDetection(){
         var ballCenterCoordY=hittenCoordY+ball.clientHeight/2
         var ballCenterCoordX=hittenCoordX+ball.clientWidth/2
         for (let i = 0; i < brickRows; i++) {
-            //Checks Row
+            //Checks Row\\
             if((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)<hittenCoordY+ball.clientHeight && hittenCoordY<(bricksGridTopGap*rootFontSize) + ((i+1)*brickHeight) + (i*bricksGap*rootFontSize)){               
                 for (let k = 0; k < brickColumns; k++) {
-                    //Check Column
+                    //Check Column\\
                     if(bricksMat[i][k][1]!=0 && (game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)<hittenCoordX+ball.clientWidth && hittenCoordX<(game_container.clientWidth - bricksGridWidth)/2 + ((k+1)*brickWidth) + (k*bricksGap*rootFontSize)){
-                        if (bricksMat[i][k][1]==1) {
-                            document.getElementById(bricksMat[i][k][0]).style.display="none";
-                        }else{
-                            bricksMat[i][k][2]++;
-                            document.getElementById(bricksMat[i][k][0]).src='resources/imgs/breakout_tile_set_1/png/'+bricksMat[i][k][2]+'-Breakout-Tiles.png';
+                        //Brick Properties\\
+                        var brickCenterCoordY=document.getElementById(bricksMat[i][k][0]).offsetTop+brickHeight/2;//(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
+                        var brickCenterCoordX=document.getElementById(bricksMat[i][k][0]).offsetLeft+brickWidth/2;//(game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)+brickWidth/2;
+
+                        console.log(brickCenterCoordX + " - " + brickCenterCoordY);
+
+                        //Break the bricks\\
+                        if(bricksMat[i][k][3]!=2){
+                            if (bricksMat[i][k][1]==1) {
+                                document.getElementById(bricksMat[i][k][0]).style.display="none";
+                            }else{
+                                bricksMat[i][k][2]++;
+                                document.getElementById(bricksMat[i][k][0]).src='resources/imgs/breakout_tile_set_1/png/'+bricksMat[i][k][2]+'-Breakout-Tiles.png';
+                            }
+                            bricksMat[i][k][1]--;
+                            score+=50*scoreMultiplier;
                         }
-                        bricksMat[i][k][1]--;
 
-                        //Check if there is any brick left
+                        //Drop powers\\
+                        //Extra Life\\
+                        if(bricksMat[i][k][3]==1){
+                            document.getElementById(bricksMat[i][k][0]).style.display="none";
+
+                            const newLife = document.createElement('img');
+                            newLife.id = i + '-' + k + '_f';
+                            newLife.className = 'hearts';
+                            newLife.src = 'resources/imgs/breakout_tile_set_1/png/60-Breakout-Tiles.png';
+                            newLife.style.display = "inline";
+                            newLife.style.position = "absolute";
+                            newLife.style.top = brickCenterCoordY + 'px';
+                            newLife.style.left = brickCenterCoordX + 'px';
+
+                            game_container.appendChild(newLife);
+                            var htmlEl = document.getElementById(i+'-'+k+'_f');
+                            if(htmlEl){
+                                startPower(htmlEl,null,"f");
+                            }else{
+                                console.error("ERROR: Failed to create the Extra Life Power HTML Element.");
+                            }
+                        }
+
+                        //Check if there is any brick left\\
                         var countingSum=0;
-                        for (let x = 0; x < bricksMat.length; x++)for (let b = 0; b < bricksMat[0].length; b++)countingSum+=bricksMat[x][b][1];
-                        if(countingSum==0){endLevel();return "";}
+                        for (let x = 0; x < bricksMat.length; x++)for (let b = 0; b < bricksMat[0].length; b++)countingSum+=(bricksMat[x][b][3]==2)?0:bricksMat[x][b][1];
+                        if(countingSum==0){
+                            endLevel();
+                            return "";
+                        }
 
-                        //Detect hitten side
-                        brickCenterCoordY=(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
-                        brickCenterCoordX=(game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)+brickWidth/2;
-                        line1=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight-brickCenterCoordY);
-                        line2=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)-brickCenterCoordY);
+                        //Detect hitten side\\
+                        var line1=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight-brickCenterCoordY);
+                        var line2=(ballCenterCoordY-brickCenterCoordY)*((game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)-brickCenterCoordX)-(ballCenterCoordX-brickCenterCoordX)*((bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)-brickCenterCoordY);
                         if((line1>=0 && line2>=0)||(line1<=0 && line2<=0)){
-                            if (brickCenterCoordY>ballCenterCoordY) {
-                                score+=50*scoreMultiplier;
+                            if (brickCenterCoordY>ballCenterCoordY) {  
                                 return "b";
                             }else{
-                                score+=50*scoreMultiplier;
                                 return "t";
                             }                           
                         }else{
                             if (brickCenterCoordX>ballCenterCoordX) {
-                                score+=50*scoreMultiplier;
                                 return "r";
                             }else{
-                                score+=50*scoreMultiplier;
                                 return "l";
                             }
-                        }
+                        } 
                     }                          
                 }
             }
@@ -578,6 +707,8 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
  */
 function endLevel(){
     actualLevel++;
+    score+=(100*actualLevel)>=5000?5000:100*actualLevel;
+    scoreMultiplier+=0.1;
     
     //Set default position for the ball\\
     ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
@@ -587,7 +718,7 @@ function endLevel(){
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
     //Stops the ball and paddle while the bricks are being rebuilt\\
-    clearInterval(ballMovement);
+    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
     disableGameControls();   
     
     //Removes the bricks to start rebuilding them\\
@@ -598,21 +729,25 @@ function endLevel(){
     bricksGenerator("hidden",-topMod,0);
 
     //Start the animation\\
-    var newLevelBricksAnimation = setInterval(function(){
-        for (let i = 0; i < brickRows; i++) {
-            for (let k = 0; k < brickColumns; k++) {
-                var b = document.getElementById(i+"-"+k);
-                b.style.top=(b.offsetTop+1)+"px";
-                if(b.offsetTop>rootFontSize/3)b.style.visibility="visible";
+    var intervalTimeControl = 0;
+    if(!runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.push(["newLevelBricksAnimation",function(){
+        if (intervalTimeControl%2==0){
+            for (let i = 0; i < brickRows; i++) {
+                for (let k = 0; k < brickColumns; k++) {
+                    var b = document.getElementById(i+"-"+k);
+                    b.style.top=(b.offsetTop+1)+"px";
+                    if(b.offsetTop>rootFontSize/3)b.style.visibility="visible";
+                }
+            }
+
+            if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
+                enableGameControls();
+                startBallMotion();
+                runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
             }
         }
-
-        if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
-            enableGameControls();
-            startBallMotion();
-            clearInterval(newLevelBricksAnimation);
-        }
-    },100);
+        intervalTimeControl++;
+    }]);
 }
 
 /**
