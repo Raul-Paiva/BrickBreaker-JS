@@ -697,8 +697,8 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
         var rawAngle=Math.asin(co/hip);
 
         if(hittenSide=="t"){//top
-            if(Math.abs(startCoordX-hittenCoordX)<10){
-                angle=Math.random()>0.5?((3*Math.PI/2)-(Math.random()/2)):((3*Math.PI/2)+(Math.random()/2));
+            if(Math.abs(startCoordX-hittenCoordX)<160/rootFontSize){
+                angle=Math.random()>0.4?((3*Math.PI/2)-(Math.random()/2)):((3*Math.PI/2)+(Math.random()/2));
             }
             else if(startCoordX>hittenCoordX){
                 angle=Math.PI + rawAngle;
@@ -706,8 +706,8 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
                 angle=(2*Math.PI)-rawAngle;
             }
         }else{//bottom
-            if(Math.abs(startCoordX-hittenCoordX)<10){
-                angle=Math.random()>0.5?((Math.PI/2)-(Math.random()/4)):((Math.PI/2)+(Math.random()/4));
+            if(Math.abs(startCoordX-hittenCoordX)<160/rootFontSize){
+                angle=Math.random()>0.4?((Math.PI/2)-(Math.random()/4)):((Math.PI/2)+(Math.random()/4));
             }
             else if(startCoordX>hittenCoordX){
                 angle=(Math.PI)-rawAngle;
@@ -722,8 +722,8 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
         var rawAngle=Math.asin(co/hip);
 
         if(hittenSide=="r"){//right
-            if(Math.abs(startCoordY-hittenCoordY)<10){
-                angle=Math.random()>0.5?(Math.PI-((Math.random()*Math.PI)/4)):(Math.PI+((Math.random()*Math.PI)/4));
+            if(Math.abs(startCoordY-hittenCoordY)<160/rootFontSize){
+                angle=Math.random()>0.4?(Math.PI-((Math.random()*Math.PI)/4)):(Math.PI+((Math.random()*Math.PI)/4));
             }
             else if(startCoordY>hittenCoordY){
                 angle=Math.PI/2 + rawAngle;
@@ -731,8 +731,8 @@ function calcNewAngle(startCoordX, startCoordY, hittenSide){
                 angle=((3*Math.PI)/2)-rawAngle;
             }
         }else{//left
-            if(Math.abs(startCoordY-hittenCoordY)<10){
-                angle=Math.random()>0.5?((Math.random()*Math.PI)/4):((2*Math.PI)-((Math.random()*Math.PI)/4));
+            if(Math.abs(startCoordY-hittenCoordY)<160/rootFontSize){
+                angle=Math.random()>0.4?((Math.random()*Math.PI)/4):((2*Math.PI)-((Math.random()*Math.PI)/4));
             }
             else if(startCoordY>hittenCoordY){
                 angle=Math.PI/2 - rawAngle;
