@@ -1,5 +1,6 @@
 var game_container = document.getElementById("game-container");
 var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
+var isDragging = false;
 var score = 0;
 var scoreMultiplier = 1;
 var lives = 3;
@@ -52,6 +53,9 @@ window.onload = function() {
         clearInterval(menuMusicInterval);  
         }
     }, 1000);
+
+    document.addEventListener('pointerdown', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
+    document.addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
@@ -301,7 +305,7 @@ function movePaddle(deltaX) {
 /**
  * Handles the controls that the user needs to play(WASD or Arrows).
  */
-function handleGameControls(event) {
+function handleGameControlsKey(event) {
     if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
         event.preventDefault(); 
         movePaddle(-paddleSpeed);
@@ -317,17 +321,42 @@ function handleGameControls(event) {
         endLevel();
     }
 }
+
+/**
+ * Handles the controls that the user needs to play(Touch and Mouse).
+ */
+function handleGameControlsScreen(e) {
+    const isTouch = e.pointerType === 'touch';
+    const isMouseDragging = e.pointerType === 'mouse' && isDragging;
+    
+    if (isTouch || isMouseDragging) {
+        var paddleWidth = paddle.clientWidth;
+        var newLeft = e.clientX-paddleWidth;
+        var containerWidth = game_container.clientWidth;
+        
+        if (newLeft < 0) {
+            newLeft = 0;
+        } else if (newLeft + paddleWidth > containerWidth) {
+            newLeft = containerWidth - paddleWidth;
+        }
+
+        paddle.style.left = newLeft + "px";
+    }
+}
+
 /**
  * Enables the controls that the user needs to play(WASD or Arrows).
  */
 function enableGameControls() {
-    document.addEventListener("keydown", handleGameControls)
+    document.addEventListener("keydown", handleGameControlsKey);
+    document.addEventListener("pointermove", handleGameControlsScreen);
 }
 /**
  * Disables the controls that the user needs to play(WASD or Arrows).
  */
 function disableGameControls(){
-    document.removeEventListener("keydown", handleGameControls);
+    document.removeEventListener("keydown", handleGameControlsKey);
+    document.removeEventListener("pointermove", handleGameControlsScreen);
 }
 
 /**
@@ -495,14 +524,25 @@ function restartBallMotionOnUserInput(){
     runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
     disableGameControls();
 
-    var cleaner = new AbortController();
+    var cleaner1 = new AbortController();
     document.addEventListener("keydown", (event) => {
         if(event.key === " "){
             startBallMotion();
             enableGameControls();
-            cleaner.abort();
+            cleaner1.abort();
         }
-    }, { signal: cleaner.signal });     
+    }, { signal: cleaner1.signal });  
+
+    setTimeout(() => {
+        var cleaner2 = new AbortController();   
+        document.addEventListener("pointerdown", (e) => {
+            if(e.pointerType === 'touch' || e.pointerType === 'mouse'){
+                startBallMotion();
+                enableGameControls();
+                cleaner2.abort();
+            }
+        }, { signal: cleaner2.signal });  
+    },1000);  
 }
 
 /**

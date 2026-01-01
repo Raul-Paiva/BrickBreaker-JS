@@ -32,11 +32,13 @@
 body{
     overflow: hidden;
     font-family: Arial, sans-serif;
+    height: 100%;
     margin: 0;
     padding: 0;
     background-color: #000000;
     color: #ffffff;
     text-align: center;
+    touch-action: none;
 }
 /*--------------------------Menu------------------------*/
 
@@ -205,11 +207,15 @@ body{
 
 #header{
     visibility: hidden;
+    pointer-events: none;
+    user-select: none;  
 }
     #header img{
         width: 20rem;
         height: auto;
         margin: auto;
+        pointer-events: none;
+        user-select: none;  
     }
 
 main{
@@ -217,6 +223,7 @@ main{
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+    pointer-events: none;
 
     height: 100%;
     width: 100%;
@@ -226,6 +233,7 @@ main{
 
 .game-container{
     position: relative;
+    pointer-events: none;
 
     min-width: 55rem;
     width: 55rem; 
@@ -278,10 +286,12 @@ main{
     
     /*box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);*/
     border-radius: 10px;
+    pointer-events: none;
 }
 
 .right-panel{
     visibility: hidden;
+    pointer-events: none;
     /*vidas*/
 }
 /*
@@ -346,6 +356,7 @@ main{
 .hearts{
     width: 1.3rem;
     height: auto;
+    pointer-events: none;
 }
 
 @keyframes rotation{
@@ -364,16 +375,22 @@ main{
     top: 32rem;
     width: 8rem;
     height: auto;
+    pointer-events: none;
+    user-select: none;  
 }
 
 .ball{
     position: absolute;
     width: 1.5rem;
     height: auto;
+    pointer-events: none;
+    user-select: none;  
 }
 
 .brick{
     position: absolute;
     width: 6rem;
     height: auto;
+    pointer-events: none;
+    user-select: none;  
 }
