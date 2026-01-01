@@ -330,6 +330,8 @@ function handleGameControlsScreen(e) {
     const isMouseDragging = e.pointerType === 'mouse' && isDragging;
     
     if (isTouch || isMouseDragging) {
+        if (e.cancelable) e.preventDefault();
+        
         var paddleWidth = paddle.clientWidth;
         var newLeft = e.clientX-paddleWidth;
         var containerWidth = game_container.clientWidth;
