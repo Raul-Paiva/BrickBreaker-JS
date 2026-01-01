@@ -29,6 +29,9 @@
     
 }
 
+html{
+    touch-action: none;
+}
 body{
     overflow: hidden;
     font-family: Arial, sans-serif;
