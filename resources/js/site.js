@@ -1,11 +1,11 @@
-var game_container = document.getElementById("game-container");
+const game_container = document.getElementById("game-container");
 var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // px per rem
 var isDragging = false;
 var score = 0;
 var scoreMultiplier = 1;
 var lives = 3;
 var actualLevel = 0;
-var gravitySpeed = 0.08;//in rem units
+const gravitySpeed = 0.08;//in rem units
 //Powers\\
 /**
  * Index: 0 - Interval Id; 1 - Expected Time(can be null); 2 - Type(f - Falling, tb - Timed Bonus, tm - Timed Modification); 3 - Status(1-running, 0-ended);
@@ -13,15 +13,17 @@ var gravitySpeed = 0.08;//in rem units
 var activePowers =[];
 //Ball\\
 const ball = document.getElementById("ball");
-var ballSpeedX = 0.2*rootFontSize;
-var ballSpeedY = 0.2*rootFontSize;
+const ballSpeedX = 0.2*rootFontSize;
+const ballSpeedY = 0.2*rootFontSize;
+var ballSpeedMultiplier = 1;
 //Paddle\\
-var paddle = document.getElementById("paddle");
-var paddleSpeed = 20;
+const paddle = document.getElementById("paddle");
+const paddleSpeed = 20;
+var paddleSpeedMultiplier = 1;
 //Bricks\\
 var bricksMat=[];
-var brickWidth = document.getElementById("brickExample").clientWidth;
-var brickHeight = document.getElementById("brickExample").clientHeight;
+const brickWidth = document.getElementById("brickExample").clientWidth;
+const brickHeight = document.getElementById("brickExample").clientHeight;
 var brickRows=5;
 var brickColumns = 7;
 var bricksGap = 0.25;//in rem units
@@ -308,11 +310,11 @@ function movePaddle(deltaX) {
 function handleGameControlsKey(event) {
     if(event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
         event.preventDefault(); 
-        movePaddle(-paddleSpeed);
+        movePaddle(-paddleSpeed*paddleSpeedMultiplier);
     }
     else if(event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
         event.preventDefault(); 
-        movePaddle(paddleSpeed);
+        movePaddle(paddleSpeed*paddleSpeedMultiplier);
     }else if(event.key==="ArrowUp" || event.key==="ArrowDown" || event.key=== " "){
         event.preventDefault();
     }
@@ -498,17 +500,17 @@ function startBallMotion() {
 
 
         if(angle < Math.PI && angle > Math.PI/2) {
-            newLeft = ball.offsetLeft - ballSpeedX * Math.cos(Math.PI - angle);
-            newTop = ball.offsetTop - ballSpeedY * Math.sin(Math.PI - angle);
+            newLeft = ball.offsetLeft - ballSpeedX * ballSpeedMultiplier * Math.cos(Math.PI - angle);
+            newTop = ball.offsetTop - ballSpeedY * ballSpeedMultiplier * Math.sin(Math.PI - angle);
         }else if(angle > 0 && angle < Math.PI/2){
-            newLeft = ball.offsetLeft + ballSpeedX * Math.cos(angle);
-            newTop = ball.offsetTop - ballSpeedY * Math.sin(angle);
+            newLeft = ball.offsetLeft + ballSpeedX * ballSpeedMultiplier * Math.cos(angle);
+            newTop = ball.offsetTop - ballSpeedY * ballSpeedMultiplier * Math.sin(angle);
         }else if(angle > Math.PI && angle < 3*Math.PI/2){
-            newLeft = ball.offsetLeft - ballSpeedX * Math.cos(angle - Math.PI);
-            newTop = ball.offsetTop + ballSpeedY * Math.sin(angle - Math.PI);
+            newLeft = ball.offsetLeft - ballSpeedX * ballSpeedMultiplier * Math.cos(angle - Math.PI);
+            newTop = ball.offsetTop + ballSpeedY * ballSpeedMultiplier * Math.sin(angle - Math.PI);
         }else{
-            newLeft = ball.offsetLeft + ballSpeedX * Math.cos(2*Math.PI - angle);
-            newTop = ball.offsetTop + ballSpeedY * Math.sin(2*Math.PI - angle);
+            newLeft = ball.offsetLeft + ballSpeedX * ballSpeedMultiplier * Math.cos(2*Math.PI - angle);
+            newTop = ball.offsetTop + ballSpeedY * ballSpeedMultiplier * Math.sin(2*Math.PI - angle);
         }
         
         ball.style.left = newLeft + "px";
