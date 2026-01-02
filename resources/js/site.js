@@ -77,7 +77,6 @@ function startGame() {
     document.getElementById("countdown").style.display = "block";
     ball.style.opacity='1';
     for (let i = 0; i < lives; i++) document.getElementById(`heart${i+1}`).src="resources/imgs/menu/hearts_byArtBIT/heart1.png"; 
-    score=0;
     document.getElementById("score").innerHTML=score;
 
     gameStartPositions();
@@ -254,6 +253,15 @@ function gameStartPositions() {
 
     //Start Effects/Animations\\
     if(!runningFunctions.some(f => f[0] === "eletricEffect"))runningFunctions.push(["eletricEffect",startAnimation(50,52)]);
+
+    //Set Multipliers to Default\\
+    scoreMultiplier=1;
+    paddleSpeedMultiplier=1;
+    ballSpeedMultiplier=1;
+
+    //Restart Levels\\
+    actualLevel=0;
+    score=0;
 }
 
 /**
