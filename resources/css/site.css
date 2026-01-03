@@ -232,6 +232,17 @@ main{
     padding: 0;
 }
 
+.levelup{
+    display: inline;
+    position: absolute;
+    height: 5rem;
+    width: auto;
+
+    user-select: none;
+    pointer-events: none;
+    touch-action: none;
+}
+
 .game-container{
     position: relative;
     touch-action: none;

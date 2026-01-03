@@ -41,6 +41,7 @@ var menuMusicInterval;
 var gameoverThemeMusics=['GameOver-Music/Theme1_byCleytonKauffman/No_Hope.mp3','GameOver-Music/Theme1_byCleytonKauffman/Retro_No_hope.mp3'];
 var gameThemeMusic=['Theme-Music/Theme2_byTechnodono/breakout.mp3','Theme-Music/Theme3_byMopz/ctr_ingame.mp3','Theme-Music/Theme3_byMopz/ctr_title.mp3','Theme-Music/Theme4_bySpringSpring/night night.mp3'];
 var menuThemeMusics=['Theme-Music/Theme1_byJan125/1.mp3','Theme-Music/Theme1_byJan125/2.mp3','Theme-Music/Theme1_byJan125/3.mp3','Theme-Music/Theme1_byJan125/4.mp3','Theme-Music/Theme1_byJan125/5.mp3','Theme-Music/Theme1_byJan125/6.mp3'];
+var levelupThemeMusics =['LevelUp-Music/Theme1_byBartKelsey/chipquest.mp3','LevelUp-Music/Theme1_byBartKelsey/orchestra.mp3','LevelUp-Music/Theme1_byBartKelsey/piano.mp3'];
 
 window.onload = function() {
     setBackgroundStars(document.body);
@@ -793,9 +794,48 @@ function endLevel(){
             }
 
             if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
-                enableGameControls();
-                startBallMotion();
+            
                 runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
+                var levelUpRemoveList = [];
+
+                var xAlignment = (game_container.clientWidth/2)-(7*rootFontSize);
+                const level = document.createElement('img');
+                level.className = 'levelup';
+                level.src = 'resources/imgs/game_messages/pt/level.png';
+                level.style.paddingRight = "1rem";
+                level.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
+                level.style.left =  xAlignment+"px";
+                game_container.appendChild(level);
+                xAlignment+=(7*rootFontSize)+(3.75*rootFontSize);
+                levelUpRemoveList.push(level);
+
+                const digits = String(actualLevel).split('');
+                digits.forEach(dg => {
+                    const newDig = document.createElement('img');
+                    newDig.className = 'levelup';
+                    newDig.src = 'resources/imgs/game_messages/'+dg+'.png';
+                    newDig.style.paddingLeft = "0.3rem";
+                    newDig.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
+                    newDig.style.left =  xAlignment+"px";
+                    game_container.appendChild(newDig);
+                    xAlignment+=1.5*rootFontSize;
+                    levelUpRemoveList.push(newDig);
+                });
+
+                const levelUpMusic = document.getElementById("generalAudio");
+                levelUpMusic.src = 'resources/sounds/'+levelupThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+                levelUpMusic.loop=false;
+                levelUpMusic.volume=0.6;
+                levelUpMusic.play(); 
+
+
+                setTimeout(function(){
+                    levelUpRemoveList.forEach(element => {
+                        element.remove();
+                    });
+                    enableGameControls();
+                    startBallMotion();
+                },2000);
             }
         }
         intervalTimeControl++;
