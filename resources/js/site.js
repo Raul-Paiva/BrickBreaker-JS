@@ -782,7 +782,7 @@ function endLevel(){
 
     //Start the animation\\
     var intervalTimeControl = 0;
-    if(!runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.push(["newLevelBricksAnimation",function(){
+    if(!runningFunctions.some(f => f[0] === "newLevelBricksAnimation"))runningFunctions.push(["newLevelBricksAnimation",function(){
         if (intervalTimeControl%2==0){
             for (let i = 0; i < brickRows; i++) {
                 for (let k = 0; k < brickColumns; k++) {
