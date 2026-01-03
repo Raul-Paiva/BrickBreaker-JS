@@ -343,7 +343,7 @@ function handleGameControlsScreen(e) {
         if (e.cancelable) e.preventDefault();
 
         var paddleWidth = paddle.clientWidth;
-        var newLeft = e.clientX-paddleWidth;
+        var newLeft = e.clientX-game_container.offsetLeft-paddleWidth/2;
         var containerWidth = game_container.clientWidth;
         
         if (newLeft < 0) {
