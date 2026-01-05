@@ -80,8 +80,8 @@ function startGame() {
     for (let i = 0; i < lives; i++) document.getElementById(`heart${i+1}`).src="resources/imgs/menu/hearts_byArtBIT/heart1.png"; 
     document.getElementById("score").innerHTML=score;
 
-    gameStartPositions();
-    //maybe create an animation in the countdown interval for the bricks to come down
+    gameStartPositions(true);
+
     var count = 2;
     var countdown = setInterval(function(){
         document.getElementById("countdown").src=`resources/imgs/countdown/${count}.png`;
@@ -106,10 +106,9 @@ function startGame() {
         musicPlaying.volume=0.2;
         musicPlaying.play();  
 
-        bricksGenerator();
-        enableGameControls();
         startGameLoop();
-        startBallMotion();
+        playBricksAnimation();
+          
     }, 3500);
 }
 
@@ -236,7 +235,7 @@ function gameOver(){
 /**
  * Positions the game elements in their default starting positions.
  */
-function gameStartPositions() {
+function gameStartPositions(itsFirstBuild=false) {
 
     //Activate ball and paddle\\
     ball.style.display = "inline";
@@ -249,20 +248,30 @@ function gameStartPositions() {
     //Set default position for the paddle\\
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
+    //Stops the ball and paddle only while the bricks are being rebuilt\\
+    if(!itsFirstBuild){
+        runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+        disableGameControls(); 
+    }  
+
+    
+    if (itsFirstBuild) {
+        //Start Effects/Animations on the first build\\
+        if(!runningFunctions.some(f => f[0] === "eletricEffect"))runningFunctions.push(["eletricEffect",startAnimation(50,52)]);
+
+        //Set Multipliers to Default\\
+        scoreMultiplier=1;
+        paddleSpeedMultiplier=1;
+        ballSpeedMultiplier=1;
+
+        //Restart Levels\\
+        actualLevel=0;
+        score=0;
+    }
+
     //Assure there are no doubled bricks\\
     removeBricks();
 
-    //Start Effects/Animations\\
-    if(!runningFunctions.some(f => f[0] === "eletricEffect"))runningFunctions.push(["eletricEffect",startAnimation(50,52)]);
-
-    //Set Multipliers to Default\\
-    scoreMultiplier=1;
-    paddleSpeedMultiplier=1;
-    ballSpeedMultiplier=1;
-
-    //Restart Levels\\
-    actualLevel=0;
-    score=0;
 }
 
 /**
@@ -424,6 +433,71 @@ function bricksGenerator(visibility="visible",topModifier=0,leftModifier=0){
         bricksContainer.innerHTML = element;
         game_container.insertBefore(bricksContainer.firstElementChild, game_container.firstChild);
     }); 
+}
+
+function playBricksAnimation(){
+    var topMod = ((bricksGridTopGap*rootFontSize)+(brickRows*brickHeight)+(brickRows*bricksGap*rootFontSize)-bricksGap);
+    bricksGenerator("hidden",-topMod,0);
+
+    //Start the animation\\
+    var intervalTimeControl = 0;
+    if(!runningFunctions.some(f => f[0] === "newLevelBricksAnimation"))runningFunctions.push(["newLevelBricksAnimation",function(){
+        if (intervalTimeControl%2==0){
+            for (let i = 0; i < brickRows; i++) {
+                for (let k = 0; k < brickColumns; k++) {
+                    var b = document.getElementById(i+"-"+k);
+                    b.style.top=(b.offsetTop+1)+"px";
+                    if(b.offsetTop>rootFontSize/3)b.style.visibility="visible";
+                }
+            }
+
+            if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
+            
+                runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
+                var levelUpRemoveList = [];
+
+                var xAlignment = (game_container.clientWidth/2)-(7*rootFontSize);
+                const level = document.createElement('img');
+                level.className = 'levelup';
+                level.src = 'resources/imgs/game_messages/pt/level.png';
+                level.style.paddingRight = "1rem";
+                level.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
+                level.style.left =  xAlignment+"px";
+                game_container.appendChild(level);
+                xAlignment+=(7*rootFontSize)+(3.75*rootFontSize);
+                levelUpRemoveList.push(level);
+
+                const digits = String(actualLevel).split('');
+                digits.forEach(dg => {
+                    const newDig = document.createElement('img');
+                    newDig.className = 'levelup';
+                    newDig.src = 'resources/imgs/game_messages/'+dg+'.png';
+                    newDig.style.paddingLeft = "0.3rem";
+                    newDig.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
+                    newDig.style.left =  xAlignment+"px";
+                    game_container.appendChild(newDig);
+                    xAlignment+=1.5*rootFontSize;
+                    levelUpRemoveList.push(newDig);
+                });
+
+                const levelUpMusic = document.getElementById("generalAudio");
+                levelUpMusic.src = 'resources/sounds/'+levelupThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+                levelUpMusic.loop=false;
+                levelUpMusic.volume=0.6;
+                levelUpMusic.play(); 
+
+
+                setTimeout(function(){
+                    levelUpRemoveList.forEach(element => {
+                        element.remove();
+                    });
+                    enableGameControls();
+                    startBallMotion();
+                },2000);
+            }
+        }
+        intervalTimeControl++;
+    }]);
 }
 
 /**
@@ -763,83 +837,8 @@ function endLevel(){
     score+=(100*actualLevel)>=5000?5000:100*actualLevel;
     scoreMultiplier+=0.1;
     
-    //Set default position for the ball\\
-    ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
-    ball.style.top = (31*rootFontSize - paddle.clientHeight/2) + "px";
-
-    //Set default position for the paddle\\
-    paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
-
-    //Stops the ball and paddle while the bricks are being rebuilt\\
-    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
-    disableGameControls();   
-    
-    //Removes the bricks to start rebuilding them\\
-    removeBricks();
-
-    //Generates the bricks hidden to add animation\\
-    var topMod = ((bricksGridTopGap*rootFontSize)+(brickRows*brickHeight)+(brickRows*bricksGap*rootFontSize)-bricksGap);
-    bricksGenerator("hidden",-topMod,0);
-
-    //Start the animation\\
-    var intervalTimeControl = 0;
-    if(!runningFunctions.some(f => f[0] === "newLevelBricksAnimation"))runningFunctions.push(["newLevelBricksAnimation",function(){
-        if (intervalTimeControl%2==0){
-            for (let i = 0; i < brickRows; i++) {
-                for (let k = 0; k < brickColumns; k++) {
-                    var b = document.getElementById(i+"-"+k);
-                    b.style.top=(b.offsetTop+1)+"px";
-                    if(b.offsetTop>rootFontSize/3)b.style.visibility="visible";
-                }
-            }
-
-            if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
-            
-                runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
-                var levelUpRemoveList = [];
-
-                var xAlignment = (game_container.clientWidth/2)-(7*rootFontSize);
-                const level = document.createElement('img');
-                level.className = 'levelup';
-                level.src = 'resources/imgs/game_messages/pt/level.png';
-                level.style.paddingRight = "1rem";
-                level.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
-                level.style.left =  xAlignment+"px";
-                game_container.appendChild(level);
-                xAlignment+=(7*rootFontSize)+(3.75*rootFontSize);
-                levelUpRemoveList.push(level);
-
-                const digits = String(actualLevel).split('');
-                digits.forEach(dg => {
-                    const newDig = document.createElement('img');
-                    newDig.className = 'levelup';
-                    newDig.src = 'resources/imgs/game_messages/'+dg+'.png';
-                    newDig.style.paddingLeft = "0.3rem";
-                    newDig.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
-                    newDig.style.left =  xAlignment+"px";
-                    game_container.appendChild(newDig);
-                    xAlignment+=1.5*rootFontSize;
-                    levelUpRemoveList.push(newDig);
-                });
-
-                const levelUpMusic = document.getElementById("generalAudio");
-                levelUpMusic.src = 'resources/sounds/'+levelupThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
-                levelUpMusic.loop=false;
-                levelUpMusic.volume=0.6;
-                levelUpMusic.play(); 
-
-
-                setTimeout(function(){
-                    levelUpRemoveList.forEach(element => {
-                        element.remove();
-                    });
-                    enableGameControls();
-                    startBallMotion();
-                },2000);
-            }
-        }
-        intervalTimeControl++;
-    }]);
+    gameStartPositions();
+    playBricksAnimation();
 }
 
 /**
