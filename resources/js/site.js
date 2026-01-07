@@ -489,7 +489,7 @@ function playBricksAnimation(){
                     levelUpRemoveList.forEach(element => {
                         element.remove();
                     });
-                    
+
                     playGameMusic();
                     enableGameControls();
                     startBallMotion();
@@ -672,7 +672,6 @@ function colisionsDetection(){
     var paddleCoordY = paddle.offsetTop;
 
     if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-ball.clientHeight)<=hittenCoordY && (paddleCoordX-ball.clientWidth<=hittenCoordX) && (hittenCoordX<=(paddleCoordX+paddle.clientWidth))){
-        //left side of the paddle has some pixels of hitbox not working
 
         if((paddleCoordY+(paddle.clientHeight/2))>=(hittenCoordY+ball.clientHeight)){
             return "b";
@@ -695,8 +694,8 @@ function colisionsDetection(){
                     //Check Column\\
                     if(bricksMat[i][k][1]!=0 && (game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)<hittenCoordX+ball.clientWidth && hittenCoordX<(game_container.clientWidth - bricksGridWidth)/2 + ((k+1)*brickWidth) + (k*bricksGap*rootFontSize)){
                         //Brick Properties\\
-                        var brickCenterCoordY=document.getElementById(bricksMat[i][k][0]).offsetTop+brickHeight/2;//(bricksGridTopGap*rootFontSize) + (i*brickHeight) + (i*bricksGap*rootFontSize)+brickHeight/2;
-                        var brickCenterCoordX=document.getElementById(bricksMat[i][k][0]).offsetLeft+brickWidth/2;//(game_container.clientWidth - bricksGridWidth)/2 + (k*brickWidth) + (k*bricksGap*rootFontSize)+brickWidth/2;
+                        var brickCenterCoordY=document.getElementById(bricksMat[i][k][0]).offsetTop+brickHeight/2;
+                        var brickCenterCoordX=document.getElementById(bricksMat[i][k][0]).offsetLeft+brickWidth/2;
 
                         console.log(brickCenterCoordX + " - " + brickCenterCoordY);
 
@@ -857,18 +856,11 @@ function setBackgroundStars(element) {
 /**
  * Stops playing all audios
  */
-function clearAllAudioElements() {//mudar para limpar o grneralaudio
+function clearAllAudioElements() {
     var audio = document.getElementById("generalAudio");
 
     audio.pause();
     audio.currentTime=0;
-    /*
-    const mediaElements = document.querySelectorAll('audio, video');
-
-    mediaElements.forEach(element => {
-        element.pause();
-        element.currentTime = 0; 
-    });*/
 }
 
 /**
@@ -882,10 +874,7 @@ function soundControl(){
         if(runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="mutedSound"),1);
         document.getElementById("generalAudio").play();
         isMenuMuted=false;
-        //mute.style.display="none";
     }else{
-        //mute.style.display="none";
-        //This is just because of the new chrome policies, maybe in the feature implement full sound control
         mute.classList.remove('fa-volume-high');
         mute.classList.add('fa-volume-xmark');
         if(!runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.push(["mutedSound",function(){clearAllAudioElements()}]);
