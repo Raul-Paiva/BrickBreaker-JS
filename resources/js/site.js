@@ -3,6 +3,7 @@ var rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSiz
 var isDragging = false;
 var score = 0;
 var scoreMultiplier = 1;
+var scoreMultiplierbyHits = 1;
 var lives = 3;
 var actualLevel = 0;
 const gravitySpeed = 0.08;//in rem units
@@ -674,8 +675,10 @@ function colisionsDetection(){
     if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-ball.clientHeight)<=hittenCoordY && (paddleCoordX-ball.clientWidth<=hittenCoordX) && (hittenCoordX<=(paddleCoordX+paddle.clientWidth))){
 
         if((paddleCoordY+(paddle.clientHeight/2))>=(hittenCoordY+ball.clientHeight)){
+            scoreMultiplierbyHits = 1;
             return "b";
         }else{ //not sure if this can create new bugs(remove if it is causing problems)
+            scoreMultiplierbyHits = 1;
             return "t";
         }
     }
@@ -708,7 +711,8 @@ function colisionsDetection(){
                                 document.getElementById(bricksMat[i][k][0]).src='resources/imgs/breakout_tile_set_1/png/'+bricksMat[i][k][2]+'-Breakout-Tiles.png';
                             }
                             bricksMat[i][k][1]--;
-                            score+=50*scoreMultiplier;
+                            score+=50*scoreMultiplier*scoreMultiplierbyHits;
+                            if(scoreMultiplierbyHits<=10)scoreMultiplierbyHits++;
                         }
 
                         //Drop powers\\
