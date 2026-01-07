@@ -47,19 +47,14 @@ window.onload = function() {
     setBackgroundStars(document.body);
     startGameLoop();
 
-    menuMusicInterval = setInterval(() => {
-        if(!isMenuMuted){
-        const musicPlaying = document.getElementById("generalAudio");
-        musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
-        musicPlaying.loop=true;
-        musicPlaying.volume=0.2;
-        musicPlaying.play();  
-        clearInterval(menuMusicInterval);  
-        }
-    }, 1000);
+    const musicPlaying = document.getElementById("generalAudio");
+    musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+    musicPlaying.loop=true;
+    musicPlaying.volume=0.2; 
+    if(!runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.push(["mutedSound",function(){clearAllAudioElements();}]);
 
     paddle.addEventListener('pointerdown', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
-    paddle.getElementById("").addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
+    paddle.addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
@@ -70,7 +65,6 @@ window.onload = function() {
 function startGame() {
     clearAllAudioElements();
     if(menuMusicInterval)clearInterval(menuMusicInterval);
-    soundControl();//If added full sound control to the game, change this
 
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("gameover-content").style.display = "none";
@@ -101,15 +95,20 @@ function startGame() {
         document.getElementById("countdown").src="resources/imgs/countdown/3.png";
         document.getElementById("menu").classList.add("hidden");
 
-        const musicPlaying = document.getElementById("generalAudio");
-        musicPlaying.src = 'resources/sounds/'+menuThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
-        musicPlaying.loop=true;
-        musicPlaying.volume=0.2;
-        musicPlaying.play();  
-
         playBricksAnimation();
-          
+
     }, 3500);
+}
+
+/**
+ * Starts playing the game Music
+ */
+function playGameMusic(){
+    const musicPlaying = document.getElementById("generalAudio");
+    musicPlaying.src = 'resources/sounds/'+gameThemeMusic[Math.round(Math.random()*(gameThemeMusic.length-1))];
+    musicPlaying.loop=true;
+    musicPlaying.volume=0.2;
+    musicPlaying.play();       
 }
 
 /**
@@ -118,7 +117,6 @@ function startGame() {
 function showCredits(){
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("credits").style.display = "flex";
-    soundControl();
 }
 
 /**
@@ -481,7 +479,7 @@ function playBricksAnimation(){
                 });
 
                 const levelUpMusic = document.getElementById("generalAudio");
-                levelUpMusic.src = 'resources/sounds/'+levelupThemeMusics[Math.round(Math.random()*(menuThemeMusics.length-1))];
+                levelUpMusic.src = 'resources/sounds/'+levelupThemeMusics[Math.round(Math.random()*(levelupThemeMusics.length-1))];
                 levelUpMusic.loop=false;
                 levelUpMusic.volume=0.6;
                 levelUpMusic.play(); 
@@ -491,6 +489,8 @@ function playBricksAnimation(){
                     levelUpRemoveList.forEach(element => {
                         element.remove();
                     });
+                    
+                    playGameMusic();
                     enableGameControls();
                     startBallMotion();
                 },2000);
@@ -857,30 +857,38 @@ function setBackgroundStars(element) {
 /**
  * Stops playing all audios
  */
-function clearAllAudioElements() {
+function clearAllAudioElements() {//mudar para limpar o grneralaudio
+    var audio = document.getElementById("generalAudio");
+
+    audio.pause();
+    audio.currentTime=0;
+    /*
     const mediaElements = document.querySelectorAll('audio, video');
 
     mediaElements.forEach(element => {
         element.pause();
         element.currentTime = 0; 
-    });
+    });*/
 }
 
 /**
- * Controls if the sound is muted or not(for now just to work with new chrome policies)
+ * Controls if the sound is muted or not(created for the game to work with new chrome policies)
  */
 function soundControl(){
     var mute = document.getElementById("mute");
     if(isMenuMuted){
-        //mute.classList.remove('fa-volume-xmark');
-        //mute.classList.add('fa-volume-high');
+        mute.classList.remove('fa-volume-xmark');
+        mute.classList.add('fa-volume-high');
+        if(runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="mutedSound"),1);
+        document.getElementById("generalAudio").play();
         isMenuMuted=false;
-        mute.style.display="none";
+        //mute.style.display="none";
     }else{
-        mute.style.display="none";
+        //mute.style.display="none";
         //This is just because of the new chrome policies, maybe in the feature implement full sound control
-        //mute.classList.remove('fa-volume-high');
-        //mute.classList.add('fa-volume-xmark');
-        //isMenuMuted=true;
+        mute.classList.remove('fa-volume-high');
+        mute.classList.add('fa-volume-xmark');
+        if(!runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.push(["mutedSound",function(){clearAllAudioElements()}]);
+        isMenuMuted=true;
     }
 }
