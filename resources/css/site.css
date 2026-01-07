@@ -387,8 +387,6 @@ main{
     top: 32rem;
     width: 8rem;
     height: auto;
-    pointer-events: none;
-    touch-action: none;
     user-select: none;  
 }
 

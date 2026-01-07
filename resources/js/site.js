@@ -45,6 +45,7 @@ var levelupThemeMusics =['LevelUp-Music/Theme1_byBartKelsey/chipquest.mp3','Leve
 
 window.onload = function() {
     setBackgroundStars(document.body);
+    startGameLoop();
 
     menuMusicInterval = setInterval(() => {
         if(!isMenuMuted){
@@ -57,8 +58,8 @@ window.onload = function() {
         }
     }, 1000);
 
-    document.addEventListener('pointerdown', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
-    document.addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
+    paddle.addEventListener('pointerdown', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
+    paddle.getElementById("").addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
@@ -106,7 +107,6 @@ function startGame() {
         musicPlaying.volume=0.2;
         musicPlaying.play();  
 
-        startGameLoop();
         playBricksAnimation();
           
     }, 3500);
@@ -160,7 +160,7 @@ function returnToMenu() {
     ball.style.display = "none";
     paddle.style.display = "none";
 
-    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="eletricEffect"),1);//? e o resto nao para
+    if(runningFunctions.some(f => f[0] === "eletricEffect"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="eletricEffect"),1);//? e o resto nao para
     removeBricks();
 }
 
@@ -250,7 +250,7 @@ function gameStartPositions(itsFirstBuild=false) {
 
     //Stops the ball and paddle only while the bricks are being rebuilt\\
     if(!itsFirstBuild){
-        runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+        if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
         disableGameControls(); 
     }  
 
@@ -453,7 +453,7 @@ function playBricksAnimation(){
 
             if(document.getElementById("0-0").offsetTop==(bricksGridTopGap*rootFontSize)){
             
-                runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
+                if(runningFunctions.some(f => f[0] === "newLevelBricksAnimation"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="newLevelBricksAnimation"),1);
                 var levelUpRemoveList = [];
 
                 var xAlignment = (game_container.clientWidth/2)-(7*rootFontSize);
@@ -535,7 +535,7 @@ function startPower(powerHTMLElement,powerDuration,powerType){
                 if((paddleCoordY+paddle.clientHeight)>=hittenCoordY && (paddleCoordY-powerHTMLElement.clientHeight)<=hittenCoordY && (paddleCoordX-powerHTMLElement.clientWidth<=hittenCoordX) && (hittenCoordX<=(paddleCoordX+paddle.clientWidth))){
 
                     activePowers[activePowers.findIndex(p=>p[0]===powerId)][3]=0;
-                    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
+                    if(runningFunctions.some(f => f[0] === powerId))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
                     powerHTMLElement.remove();
                     
                     if(lives<3){
@@ -546,7 +546,7 @@ function startPower(powerHTMLElement,powerDuration,powerType){
                 }else if(hittenCoordY>=game_container.clientHeight-20 || startlevel!=actualLevel){
 
                     activePowers[activePowers.findIndex(p=>p[0]===powerId)][3]=0;
-                    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
+                    if(runningFunctions.some(f => f[0] === powerId))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]===powerId),1);
                     powerHTMLElement.remove();
                 }
 
@@ -608,7 +608,7 @@ function startBallMotion() {
  * Creates an Event Listener that waits user input to restart ball and paddle movement 
  */
 function restartBallMotionOnUserInput(){
-    runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+    if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
     disableGameControls();
 
     var cleaner1 = new AbortController();
