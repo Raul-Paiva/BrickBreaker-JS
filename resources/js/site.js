@@ -54,8 +54,8 @@ window.onload = function() {
     musicPlaying.volume=0.2; 
     if(!runningFunctions.some(f => f[0] === "mutedSound"))runningFunctions.push(["mutedSound",function(){clearAllAudioElements();}]);
 
-    paddle.addEventListener('pointerdown', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
-    paddle.addEventListener('pointerup', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
+    paddle.addEventListener('click', (e) => {if (e.pointerType === 'mouse'){isDragging = true}});
+    paddle.addEventListener('dblclick', (e) => {if (e.pointerType === 'mouse'){isDragging = false;}});
 
     // depois de 5 segundos, por o jogo a jogar sozinho ou com uma animacao relacionada enquanto ninguem esta a jogar
 };
