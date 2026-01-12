@@ -14,8 +14,7 @@ const gravitySpeed = 0.08;//in rem units
 var activePowers =[];
 //Ball\\
 const ball = document.getElementById("ball");
-const ballSpeedX = 0.2*rootFontSize;
-const ballSpeedY = 0.2*rootFontSize;
+var ballSpeed = 0.2;
 var ballSpeedMultiplier = 1;
 //Paddle\\
 const paddle = document.getElementById("paddle");
@@ -36,6 +35,7 @@ var gameLoop;//only the game elements(excludes anything that happens in the menu
  * Index: 0 - Interval Id; 1 - Function;
  */
 var runningFunctions = [];
+var gameover = false;
 //Musics\\
 var isMenuMuted = true; 
 var menuMusicInterval;
@@ -65,7 +65,6 @@ window.onload = function() {
  */
 function startGame() {
     clearAllAudioElements();
-    if(menuMusicInterval)clearInterval(menuMusicInterval);
 
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("gameover-content").style.display = "none";
@@ -249,8 +248,8 @@ function gameStartPositions(itsFirstBuild=false) {
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
     //Stops the ball and paddle only while the bricks are being rebuilt\\
-        if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
-        disableGameControls(); 
+    if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+    disableGameControls();  
 
     
     if (itsFirstBuild) {
@@ -575,36 +574,36 @@ function startBallMotion() {
     if(!runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.push(["ballMovement",function() {
         if(gameover && runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
         else{
-        count+=10;
-        var newLeft;
-        var newTop;
-        var hittenSide = colisionsDetection();
-        if(hittenSide!=""){
-            angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
-            lastCoordX = ball.offsetLeft;
-            lastCoordY = ball.offsetTop;
-        }
+            count+=10;
+            var newLeft;
+            var newTop;
+            var hittenSide = colisionsDetection();
+            if(hittenSide!=""){
+                angle = calcNewAngle(lastCoordX, lastCoordY, hittenSide);
+                lastCoordX = ball.offsetLeft;
+                lastCoordY = ball.offsetTop;
+            }
 
 
-        if(angle < Math.PI && angle > Math.PI/2) {
-            newLeft = ball.offsetLeft - ballSpeedX * ballSpeedMultiplier * Math.cos(Math.PI - angle);
-            newTop = ball.offsetTop - ballSpeedY * ballSpeedMultiplier * Math.sin(Math.PI - angle);
-        }else if(angle > 0 && angle < Math.PI/2){
-            newLeft = ball.offsetLeft + ballSpeedX * ballSpeedMultiplier * Math.cos(angle);
-            newTop = ball.offsetTop - ballSpeedY * ballSpeedMultiplier * Math.sin(angle);
-        }else if(angle > Math.PI && angle < 3*Math.PI/2){
-            newLeft = ball.offsetLeft - ballSpeedX * ballSpeedMultiplier * Math.cos(angle - Math.PI);
-            newTop = ball.offsetTop + ballSpeedY * ballSpeedMultiplier * Math.sin(angle - Math.PI);
-        }else{
-            newLeft = ball.offsetLeft + ballSpeedX * ballSpeedMultiplier * Math.cos(2*Math.PI - angle);
-            newTop = ball.offsetTop + ballSpeedY * ballSpeedMultiplier * Math.sin(2*Math.PI - angle);
-        }
-        
-        ball.style.left = newLeft + "px";
-        ball.style.top = newTop + "px";   
-        
-        //Score
-        document.getElementById("score").innerHTML=score;
+            if(angle < Math.PI && angle > Math.PI/2) {
+                newLeft = ball.offsetLeft - ballSpeed*rootFontSize * ballSpeedMultiplier * Math.cos(Math.PI - angle);
+                newTop = ball.offsetTop - ballSpeed*rootFontSize * ballSpeedMultiplier * Math.sin(Math.PI - angle);
+            }else if(angle > 0 && angle < Math.PI/2){
+                newLeft = ball.offsetLeft + ballSpeed*rootFontSize * ballSpeedMultiplier * Math.cos(angle);
+                newTop = ball.offsetTop - ballSpeed*rootFontSize * ballSpeedMultiplier * Math.sin(angle);
+            }else if(angle > Math.PI && angle < 3*Math.PI/2){
+                newLeft = ball.offsetLeft - ballSpeed*rootFontSize * ballSpeedMultiplier * Math.cos(angle - Math.PI);
+                newTop = ball.offsetTop + ballSpeed*rootFontSize * ballSpeedMultiplier * Math.sin(angle - Math.PI);
+            }else{
+                newLeft = ball.offsetLeft + ballSpeed*rootFontSize * ballSpeedMultiplier * Math.cos(2*Math.PI - angle);
+                newTop = ball.offsetTop + ballSpeed*rootFontSize * ballSpeedMultiplier * Math.sin(2*Math.PI - angle);
+            }
+            
+            ball.style.left = newLeft + "px";
+            ball.style.top = newTop + "px";   
+            
+            //Score
+            document.getElementById("score").innerHTML=score;
         }
     }]);
 }
@@ -619,14 +618,14 @@ function restartBallMotionOnUserInput(){
     var cleaner1 = new AbortController();
     var cleaner2 = new AbortController();  
     setTimeout(() => { 
-    document.addEventListener("keydown", (event) => {
-        if(event.key === " "){
-            startBallMotion();
-            enableGameControls();
-            cleaner1.abort();
+        document.addEventListener("keydown", (event) => {
+            if(event.key === " "){
+                startBallMotion();
+                enableGameControls();
+                cleaner1.abort();
                 cleaner2.abort();
-        }
-    }, { signal: cleaner1.signal });  
+            }
+        }, { signal: cleaner1.signal });  
 
 
         document.addEventListener("pointerdown", (e) => {
@@ -654,7 +653,8 @@ function colisionsDetection(){
     else if(hittenCoordX>=game_container.clientWidth-20)return "r";
 
     if(ball.offsetTop>=game_container.clientHeight-20){
-        if (lives==1) {
+        scoreMultiplierbyHits = 1;
+        if (lives<=1) {
             lives=3;
             document.getElementById("heart1").src="resources/imgs/menu/hearts_byArtBIT/heart3.png"; 
             gameover = true;
@@ -663,7 +663,7 @@ function colisionsDetection(){
         }else{
             document.getElementById(`heart${lives}`).src="resources/imgs/menu/hearts_byArtBIT/heart3.png";
             lives-=1  
-
+            
             //Set default position for the ball\\
             ball.style.left = (game_container.clientWidth / 2) - (ball.clientWidth/2) + "px";
             ball.style.top = (31*rootFontSize - paddle.clientHeight/2) + "px";
