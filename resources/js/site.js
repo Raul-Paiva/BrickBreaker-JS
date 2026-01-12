@@ -74,9 +74,10 @@ function startGame() {
     document.getElementById("countdown").style.display = "block";
     ball.style.opacity='1';
     for (let i = 0; i < lives; i++) document.getElementById(`heart${i+1}`).src="resources/imgs/menu/hearts_byArtBIT/heart1.png"; 
-    document.getElementById("score").innerHTML=score;
+    
 
     gameStartPositions(true);
+    document.getElementById("score").innerHTML=score;
 
     var count = 2;
     var countdown = setInterval(function(){
@@ -178,7 +179,7 @@ function gameOver(){
     menu.style.backgroundColor = 'rgba(0, 0, 0, 0)';
     gameoverMenu.style.opacity = '0';
 
-    clearInterval(gameLoop); 
+    if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
     disableGameControls();
 
     menu.classList.remove("hidden");
@@ -248,10 +249,8 @@ function gameStartPositions(itsFirstBuild=false) {
     paddle.style.left = (game_container.clientWidth / 2) - (paddle.clientWidth/2) + "px";
 
     //Stops the ball and paddle only while the bricks are being rebuilt\\
-    if(!itsFirstBuild){
         if(runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
         disableGameControls(); 
-    }  
 
     
     if (itsFirstBuild) {
@@ -266,6 +265,8 @@ function gameStartPositions(itsFirstBuild=false) {
         //Restart Levels\\
         actualLevel=0;
         score=0;
+        lives=3;
+        gameover=false;
     }
 
     //Assure there are no doubled bricks\\
@@ -572,6 +573,8 @@ function startBallMotion() {
     var lastCoordY = ball.offsetTop;
     var count=0;
     if(!runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.push(["ballMovement",function() {
+        if(gameover && runningFunctions.some(f => f[0] === "ballMovement"))runningFunctions.splice(runningFunctions.findIndex(f=>f[0]==="ballMovement"),1);
+        else{
         count+=10;
         var newLeft;
         var newTop;
@@ -602,6 +605,7 @@ function startBallMotion() {
         
         //Score
         document.getElementById("score").innerHTML=score;
+        }
     }]);
 }
 
@@ -613,24 +617,27 @@ function restartBallMotionOnUserInput(){
     disableGameControls();
 
     var cleaner1 = new AbortController();
+    var cleaner2 = new AbortController();  
+    setTimeout(() => { 
     document.addEventListener("keydown", (event) => {
         if(event.key === " "){
             startBallMotion();
             enableGameControls();
             cleaner1.abort();
+                cleaner2.abort();
         }
     }, { signal: cleaner1.signal });  
 
-    setTimeout(() => {
-        var cleaner2 = new AbortController();   
+
         document.addEventListener("pointerdown", (e) => {
             if(e.pointerType === 'touch' || e.pointerType === 'mouse'){
                 startBallMotion();
                 enableGameControls();
+                cleaner1.abort();
                 cleaner2.abort();
             }
         }, { signal: cleaner2.signal });  
-    },1000);  
+    },750);  
 }
 
 /**
@@ -650,7 +657,9 @@ function colisionsDetection(){
         if (lives==1) {
             lives=3;
             document.getElementById("heart1").src="resources/imgs/menu/hearts_byArtBIT/heart3.png"; 
+            gameover = true;
             gameOver();
+            return "";
         }else{
             document.getElementById(`heart${lives}`).src="resources/imgs/menu/hearts_byArtBIT/heart3.png";
             lives-=1  
