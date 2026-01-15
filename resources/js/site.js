@@ -857,7 +857,7 @@ function endLevel(){
         paddleSpeedMultiplier=1.5;
         if(ballSpeedMultiplier<4 && actualLevel%5==0)ballSpeedMultiplier+=0.1;
     }
-    ballSpeedMultiplier=4;
+    
     gameStartPositions();
     playBricksAnimation();
 }
