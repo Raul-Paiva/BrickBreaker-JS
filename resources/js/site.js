@@ -849,12 +849,12 @@ function endLevel(){
     score+=(100*actualLevel)>=5000?5000:100*actualLevel;
     scoreMultiplier+=0.1;
 
-    if(actualLevel>=2 && actualLevel<5){ballSpeedMultiplier=1.2; paddleSpeedMultiplier=1.1;}
-    else if(actualLevel>=5 && actualLevel<7){ballSpeedMultiplier=1.4; paddleSpeedMultiplier=1.2;}
-    else if(actualLevel>=7 && actualLevel<10){ballSpeedMultiplier=1.6; paddleSpeedMultiplier=1.3;}
-    else if(actualLevel>=10 && actualLevel<15){ballSpeedMultiplier=2; paddleSpeedMultiplier=1.4;}
+    if(actualLevel>=2 && actualLevel<5){ballSpeedMultiplier=1.2; paddleSpeedMultiplier=1.2;}
+    else if(actualLevel>=5 && actualLevel<7){ballSpeedMultiplier=1.4; paddleSpeedMultiplier=1.4;}
+    else if(actualLevel>=7 && actualLevel<10){ballSpeedMultiplier=1.6; paddleSpeedMultiplier=1.6;}
+    else if(actualLevel>=10 && actualLevel<15){ballSpeedMultiplier=2; paddleSpeedMultiplier=1.8;}
     else if(actualLevel>=15){
-        paddleSpeedMultiplier=1.5;
+        paddleSpeedMultiplier=2;
         if(ballSpeedMultiplier<3.5 && actualLevel%5==0)ballSpeedMultiplier+=0.1;
     }
 
