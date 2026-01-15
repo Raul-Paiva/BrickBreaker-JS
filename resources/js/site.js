@@ -855,9 +855,9 @@ function endLevel(){
     else if(actualLevel>=10 && actualLevel<15){ballSpeedMultiplier=2; paddleSpeedMultiplier=1.4;}
     else if(actualLevel>=15){
         paddleSpeedMultiplier=1.5;
-        if(ballSpeedMultiplier<4 && actualLevel%5==0)ballSpeedMultiplier+=0.1;
+        if(ballSpeedMultiplier<3.5 && actualLevel%5==0)ballSpeedMultiplier+=0.1;
     }
-    
+
     gameStartPositions();
     playBricksAnimation();
 }
