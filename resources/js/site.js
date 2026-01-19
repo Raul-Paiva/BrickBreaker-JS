@@ -458,7 +458,7 @@ function playBricksAnimation(){
                 var xAlignment = (game_container.clientWidth/2)-(7*rootFontSize);
                 const level = document.createElement('img');
                 level.className = 'levelup';
-                level.src = 'resources/imgs/game_messages/pt/level.png';
+                level.src = 'resources/imgs/game_messages/levels/pt/level.png';
                 level.style.paddingRight = "1rem";
                 level.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
                 level.style.left =  xAlignment+"px";
@@ -470,7 +470,7 @@ function playBricksAnimation(){
                 digits.forEach(dg => {
                     const newDig = document.createElement('img');
                     newDig.className = 'levelup';
-                    newDig.src = 'resources/imgs/game_messages/'+dg+'.png';
+                    newDig.src = 'resources/imgs/game_messages/levels/'+dg+'.png';
                     newDig.style.paddingLeft = "0.3rem";
                     newDig.style.top = ((game_container.clientHeight/2)-(2.5*rootFontSize))+"px";
                     newDig.style.left =  xAlignment+"px";
@@ -499,6 +499,49 @@ function playBricksAnimation(){
         }
         intervalTimeControl++;
     }]);
+}
+
+/**
+ * Plays the extra points animation
+ * @param {int} multiplierValue 
+ * @param {HTMLElement} brickElement 
+ * @returns 
+ */
+function playExtraPointsAnimation(multiplierValue, brickElement) {
+    var extraPoints=(multiplierValue*50)-50
+    if(extraPoints==0)return;
+
+    var extraPointsRemoveList = [];
+
+    var xAlignment = parseFloat(brickElement.style.left);
+    const plus = document.createElement('img');
+    plus.className = 'extra-points';
+    plus.src = 'resources/imgs/game_messages/extra-points/plus.png';
+    plus.style.paddingRight = "0.3rem";
+    plus.style.top = parseFloat(brickElement.style.top)+"px";
+    plus.style.left =  xAlignment+"px";
+    game_container.appendChild(plus);
+    xAlignment+=1*rootFontSize;
+    extraPointsRemoveList.push(plus);
+
+    const digits = String(extraPoints).split('');
+    digits.forEach(dg => {
+        const newDig = document.createElement('img');
+        newDig.className = 'extra-points';
+        newDig.src = 'resources/imgs/game_messages/extra-points/'+dg+'.png';
+        newDig.style.paddingLeft = "0.3rem";
+        newDig.style.top = parseFloat(brickElement.style.top)+"px";
+        newDig.style.left =  xAlignment+"px";
+        game_container.appendChild(newDig);
+        xAlignment+=1*rootFontSize;
+        extraPointsRemoveList.push(newDig);
+    }); 
+
+    setTimeout(() => {
+        extraPointsRemoveList.forEach(element => {
+            element.remove();
+        });
+    }, 2000);   
 }
 
 /**
@@ -721,6 +764,8 @@ function colisionsDetection(){
                             }
                             bricksMat[i][k][1]--;
                             score+=50*scoreMultiplier*scoreMultiplierbyHits;
+
+                            if(scoreMultiplierbyHits>1)playExtraPointsAnimation(scoreMultiplierbyHits, document.getElementById(bricksMat[i][k][0]));
                             if(scoreMultiplierbyHits<=10)scoreMultiplierbyHits++;
                         }
 
@@ -848,6 +893,7 @@ function endLevel(){
     actualLevel++;
     score+=(100*actualLevel)>=5000?5000:100*actualLevel;
     scoreMultiplier+=0.1;
+    scoreMultiplierbyHits=1;
 
     if(actualLevel>=2 && actualLevel<5){ballSpeedMultiplier=1.2; paddleSpeedMultiplier=1.2;}
     else if(actualLevel>=5 && actualLevel<7){ballSpeedMultiplier=1.4; paddleSpeedMultiplier=1.4;}

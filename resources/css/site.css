@@ -243,6 +243,17 @@ main{
     touch-action: none;
 }
 
+.extra-points{
+    display: inline;
+    position: absolute;
+    height: 1rem;
+    width: auto;
+
+    user-select: none;
+    pointer-events: none;
+    touch-action: none;
+}
+
 .game-container{
     position: relative;
     touch-action: none;
