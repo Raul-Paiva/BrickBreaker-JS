@@ -514,11 +514,12 @@ function playExtraPointsAnimation(multiplierValue, brickElement) {
     var extraPointsRemoveList = [];
 
     var xAlignment = parseFloat(brickElement.style.left);
+    var yAlignment = parseFloat(brickElement.style.top)+brickHeight/4;
     const plus = document.createElement('img');
     plus.className = 'extra-points';
     plus.src = 'resources/imgs/game_messages/extra-points/plus.png';
     plus.style.paddingRight = "0.3rem";
-    plus.style.top = parseFloat(brickElement.style.top)+"px";
+    plus.style.top = yAlignment+"px";
     plus.style.left =  xAlignment+"px";
     game_container.appendChild(plus);
     xAlignment+=1*rootFontSize;
@@ -530,7 +531,7 @@ function playExtraPointsAnimation(multiplierValue, brickElement) {
         newDig.className = 'extra-points';
         newDig.src = 'resources/imgs/game_messages/extra-points/'+dg+'.png';
         newDig.style.paddingLeft = "0.3rem";
-        newDig.style.top = parseFloat(brickElement.style.top)+"px";
+        newDig.style.top = yAlignment+"px";
         newDig.style.left =  xAlignment+"px";
         game_container.appendChild(newDig);
         xAlignment+=1*rootFontSize;
@@ -541,7 +542,7 @@ function playExtraPointsAnimation(multiplierValue, brickElement) {
         extraPointsRemoveList.forEach(element => {
             element.remove();
         });
-    }, 2000);   
+    }, 1000);   
 }
 
 /**
