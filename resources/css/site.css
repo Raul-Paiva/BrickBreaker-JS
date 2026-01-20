@@ -135,7 +135,9 @@ body{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
 
+#credits{
     overflow: hidden;
 }
 
@@ -163,6 +165,10 @@ body{
 @keyframes scroll-credits {
   from { transform: translateY(0); }
   to { transform: translateY(-175%);  }
+}
+
+#instructions{
+    overflow-x: hidden;
 }
 
 .return-button{
