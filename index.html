@@ -17,7 +17,7 @@
         <div id="menu-content">
             <img src="resources/imgs/menu/title.png" alt="Brick Breaker">
             <button id="play-button" class="menu-button" onclick="startGame();">Jogar</button>
-            <button id="instructions-button" class="menu-button">Instruções</button>
+            <button id="instructions-button" class="menu-button" onclick="showInstructions();">Instruções</button>
             <button id="credits-button" class="menu-button" onclick="showCredits();">Créditos</button>
             <i id="mute" class="fa-solid mute-button fa-volume-xmark" onclick="soundControl();"></i>
         </div>
@@ -33,7 +33,7 @@
                 <br><br>
                 <h4>Text and Info</h4><br>
                 <a href="https://www.youtube.com/watch?v=-VOUK-xFAyk&t=2s">Tutorial for animations by Kevin Powell</a><br>
-                <a href="https://cooltextcom/">Titles and texts in images</a>
+                <a href="https://cooltext.com/">Titles and texts in images</a>
                 <br><br>
                 <h4>Images</h4><br>
                 <a href="https://opengameart.org/">Main images source</a><br>
@@ -52,7 +52,15 @@
                 <a href="https://opengameart.org/content/level-up-sound-effects">Level Up Music by Bart Kelsey. Commissioned by Will Corwin for OpenGameArt.org</a>
                 <br><br>
             </div>
-            <button id="credits-return" class="credits-return menu-button" onclick="hideCredits();">
+            <button id="credits-return" class="return-button menu-button" onclick="hideCredits();">
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#01dcf0" stroke="none">
+                        <path d="M2729 5050 c-31 -9 -2661 -1908 -2701 -1951 -31 -32 -34 -54 -16 -94 10 -23 710 -531 2461 -1787 274 -196 285 -201 338 -149 l29 29 0 531 0 530 88 -5 c48 -3 136 -12 195 -20 541 -74 977 -385 1117 -798 118 -347 10 -724 -301 -1046 -35 -36 -71 -76 -81 -90 -53 -74 27 -155 137 -137 68 11 342 225 511 398 324 333 514 695 590 1124 27 150 25 442 -4 595 -72 384 -232 708 -494 997 -397 438 -994 710 -1646 749 l-112 7 0 524 c0 572 0 571 -57 590 -15 6 -40 7 -54 3z"/></g>
+                </svg>
+            </button>
+        </div>
+        <div id="instructions" style="display: none;">
+            <button id="instructions-return" class="return-button menu-button" onclick="hideInstructions();">
                 <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
                     <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#01dcf0" stroke="none">
                         <path d="M2729 5050 c-31 -9 -2661 -1908 -2701 -1951 -31 -32 -34 -54 -16 -94 10 -23 710 -531 2461 -1787 274 -196 285 -201 338 -149 l29 29 0 531 0 530 88 -5 c48 -3 136 -12 195 -20 541 -74 977 -385 1117 -798 118 -347 10 -724 -301 -1046 -35 -36 -71 -76 -81 -90 -53 -74 27 -155 137 -137 68 11 342 225 511 398 324 333 514 695 590 1124 27 150 25 442 -4 595 -72 384 -232 708 -494 997 -397 438 -994 710 -1646 749 l-112 7 0 524 c0 572 0 571 -57 590 -15 6 -40 7 -54 3z"/></g>

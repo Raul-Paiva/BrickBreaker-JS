@@ -146,6 +146,22 @@ function controlCredits(){
     
 }
 
+/**
+ * Displays the Instructions
+ */
+function showInstructions(){
+    document.getElementById("menu-content").style.display = "none";
+    document.getElementById("instructions").style.display = "flex";
+}
+
+/**
+ * Hides the Instructions
+ */
+function hideInstructions(){
+    document.getElementById("instructions").style.display = "none";
+    document.getElementById("menu-content").style.display = "flex"; 
+}
+
 function returnToMenu() {
     clearAllAudioElements();
 
