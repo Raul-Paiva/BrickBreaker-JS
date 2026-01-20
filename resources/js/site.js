@@ -92,6 +92,10 @@ function startGame() {
 
     setTimeout(function(){
         clearInterval(countdown);
+        const musicPlaying = document.getElementById("generalAudio");
+        musicPlaying.pause();
+        musicPlaying.currentTime = 0;
+        musicPlaying.src = '';
         document.getElementById("countdown").style.display = "none";
         document.getElementById("countdown").src="resources/imgs/countdown/3.png";
         document.getElementById("menu").classList.add("hidden");
