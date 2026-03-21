@@ -152,6 +152,29 @@ function controlCredits(){
 function showInstructions(){
     document.getElementById("menu-content").style.display = "none";
     document.getElementById("instructions").style.display = "flex";
+    const container = document.getElementById("instructions-wrapper");
+    container.innerHTML="";
+
+    var aboutTheGame = document.createElement("div");
+    var title1 = document.createElement("h3");
+    title1.innerHTML="About the Game";
+    aboutTheGame.appendChild(title1);
+    var text1 = document.createElement("p");
+    /*text1.innerHTML="This is a simple brick breaker game. Your goal is to break all the bricks without letting the ball fall. You can control the paddle using the arrow keys or by dragging it with your mouse or finger. Each time you break a brick, you earn points and may receive power-ups that can help you in your mission. Be careful, though, as some bricks are unbreakable and others may require multiple hits to break. Good luck!";*/
+    text1.innerHTML="Este é um simples jogo de brick breaker. O teu objetivo é destruir todos os tijolos sem deixar a bola cair. Podes controlar o paddle(barra) usando as setas do teclado ou arrastando-a com o teu mouse ou dedo. Cada vez que partires um tijolo, ganhas pontos e podes receber power-ups que te ajudarão na tua missão. Mas cuidado, alguns tijolos são indestrutíveis e outros podem exigir múltiplos hits para serem destruídos. Boa sorte!";
+    aboutTheGame.appendChild(text1);
+
+    var gameGoal = document.createElement("div");
+    var title2 = document.createElement("h3");
+    title2.innerHTML="Game Goal";
+    gameGoal.appendChild(title2);
+    var text2 = document.createElement("p");
+    /*text2.innerHTML="The goal of the game is to break all the bricks on the screen without letting the ball fall. You earn points for each brick you break, and you can use power-ups to help you in your mission. The game is over when you lose all your lives, which happens when the ball falls below the paddle. Try to achieve the highest score possible and have fun playing!";*/
+    text2.innerHTML="O objetivo do jogo é destruir todos os tijolos no ecrã sem deixar a bola cair! Ganhas pontos por cada tijolo que partires e podes usar power-ups, que te ajudarão nesta missão. O jogo termina quando perderes todas as vidas — e tem cuidado, isso acontece sempre que a bola passar para baixo do teu paddle(barra)! Tenta alcançar a pontuação mais alta possível e, acima de tudo, diverte-te!";
+    gameGoal.appendChild(text2);
+
+    container.appendChild(aboutTheGame);
+    container.appendChild(gameGoal);
 }
 
 /**
@@ -160,6 +183,24 @@ function showInstructions(){
 function hideInstructions(){
     document.getElementById("instructions").style.display = "none";
     document.getElementById("menu-content").style.display = "flex"; 
+    container.innerHTML="";
+}
+
+/**
+ * Goes to the next instruction(should be activated with the respective button) - won't be implemented in this version, but the idea is to have multiple instruction pages that the user can navigate through with next and previous buttons
+ */
+function nextInstruction(){
+    const container = document.getElementById("instructions-wrapper");
+    container.innerHTML="";
+
+}
+
+/**
+ * Goes to the previous instruction(should be activated with the respective button) - won't be implemented in this version, but the idea is to have multiple instruction pages that the user can navigate through with next and previous buttons
+ */
+function prevInstruction(){
+    const container = document.getElementById("instructions-wrapper");
+    container.innerHTML="";
 }
 
 function returnToMenu() {

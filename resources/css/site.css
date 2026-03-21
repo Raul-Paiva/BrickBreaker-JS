@@ -135,9 +135,7 @@ body{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
 
-#credits{
     overflow: hidden;
 }
 
@@ -167,9 +165,35 @@ body{
   to { transform: translateY(-175%);  }
 }
 
-#instructions{
-    overflow-x: hidden;
-}
+    #instructions-wrapper{
+        position: absolute;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        min-width: 55rem;
+        width: 55rem; 
+        min-height: 37rem;
+        height: 37rem;
+        margin: 5px;
+    }
+        #instructions-wrapper div{
+            margin: 2rem;
+        }
+
+        #instructions-wrapper h3{
+            color: #01dcf0;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 2rem;
+        }
+
+        #instructions-wrapper p{
+            color: #bdbdbd;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 1.2rem;
+        }
 
 .return-button{
     border-radius: 50%;
